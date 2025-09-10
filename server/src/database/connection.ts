@@ -1,6 +1,6 @@
 import sqlite3 from 'sqlite3';
 import { join } from 'path';
-const { SCHEMA_SQL } = require('./schema.js');
+import { SCHEMA_SQL } from './schema';
 
 export class Database {
     private db!: sqlite3.Database;
