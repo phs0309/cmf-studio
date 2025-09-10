@@ -3,7 +3,7 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 
 export class Database {
-    private db: sqlite3.Database;
+    private db!: sqlite3.Database;
 
     constructor() {
         // Use PostgreSQL URL if available (Render), otherwise SQLite

@@ -48,7 +48,7 @@ export class FileUploadService {
     });
   }
 
-  public getFileUrl(filename: string, req: Express.Request): string {
+  public getFileUrl(filename: string, req: any): string {
     const baseUrl = `${req.protocol}://${req.get('host')}`;
     return `${baseUrl}/uploads/${filename}`;
   }
