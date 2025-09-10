@@ -1,0 +1,5 @@
+{
+  "name": "AI CMF Designer",
+  "description": "Upload a product image, choose a material and color, and let AI generate a new design concept. CMF (Color, Material, Finish) design made easy.",
+  "requestFramePermissions": []
+}
