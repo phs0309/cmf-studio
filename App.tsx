@@ -10,7 +10,7 @@ import { Menu } from './components/Menu';
 import { ChevronLeftIcon } from './components/icons/ChevronLeftIcon';
 import { CodeEntryModal } from './components/CodeEntryModal';
 import { getRecommendedDesigns, addSubmission } from './services/apiService';
-import type { RecommendedDesign } from './data/mockDb';
+import type { RecommendedDesign } from './services/apiService';
 import { RecommendationCard } from './components/RecommendationCard';
 import { AdminPage } from './components/AdminPage';
 import { SubmissionModal } from './components/SubmissionModal';

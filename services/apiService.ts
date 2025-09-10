@@ -1,75 +1,166 @@
-// FIX: Update imports to use getter functions instead of directly accessing data arrays from the mock DB.
-import { 
-  RecommendedDesign,
-  Submission,
-  AddSubmissionData,
-  addRecommendation as dbAddRecommendation,
-  deleteRecommendation as dbDeleteRecommendation,
-  getAllRecommendations as dbGetAllRecommendations,
-  addCode as dbAddCode,
-  deleteCode as dbDeleteCode,
-  addSubmission as dbAddSubmission,
-  getAllSubmissions as dbGetAllSubmissions,
-  cleanupBlobUrls as dbCleanupBlobUrls,
-  getAllValidCodes as dbGetAllValidCodes,
-} from '../data/mockDb';
+// API Configuration - Render Backend
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://your-app-name.onrender.com/api';
 
-// Simulate network delay
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+// Types
+export interface RecommendedDesign {
+  id: number;
+  title: string;
+  description: string;
+  image_url: string;
+  access_code: string;
+  created_at: string;
+}
 
-// FIX: Use the imported `dbGetAllRecommendations` function to get data, resolving the error.
+export interface Submission {
+  id: number;
+  access_code: string;
+  comment: string;
+  generated_image_url: string;
+  created_at: string;
+  original_images: string[];
+}
+
+export interface AddSubmissionData {
+  accessCode: string;
+  comment: string;
+  originalImageFiles: File[];
+  generatedImageUrl: string;
+}
+
+interface ApiResponse<T> {
+  success: boolean;
+  data?: T;
+  error?: string;
+}
+
+// Helper function for API calls
+const apiCall = async <T>(
+  endpoint: string, 
+  options: RequestInit = {}
+): Promise<T> => {
+  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+    ...options,
+  });
+
+  const result: ApiResponse<T> = await response.json();
+  
+  if (!result.success || !response.ok) {
+    throw new Error(result.error || 'API call failed');
+  }
+  
+  return result.data as T;
+};
+
+// Helper function for file uploads
+const uploadFiles = async <T>(
+  endpoint: string,
+  formData: FormData
+): Promise<T> => {
+  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    method: 'POST',
+    body: formData,
+  });
+
+  const result: ApiResponse<T> = await response.json();
+  
+  if (!result.success || !response.ok) {
+    throw new Error(result.error || 'Upload failed');
+  }
+  
+  return result.data as T;
+};
+
+// Recommendations API
 export const getRecommendedDesigns = async (accessCode: string): Promise<RecommendedDesign[]> => {
-  await delay(800); // Simulate fetching data
-  return dbGetAllRecommendations().filter(r => r.accessCode === accessCode);
+  return apiCall<RecommendedDesign[]>(`/recommendations?accessCode=${encodeURIComponent(accessCode)}`);
 };
 
 export const getAllRecommendations = async (): Promise<RecommendedDesign[]> => {
-    await delay(400); // Simulate admin fetch
-    return dbGetAllRecommendations();
+  return apiCall<RecommendedDesign[]>('/recommendations/all');
 };
 
-export const addRecommendation = async (recData: Omit<RecommendedDesign, 'id' | 'imageUrl'>, imageFile: File): Promise<RecommendedDesign> => {
-    await delay(500);
-    return dbAddRecommendation(recData, imageFile);
+export const addRecommendation = async (
+  recData: Omit<RecommendedDesign, 'id' | 'image_url' | 'created_at'>, 
+  imageFile: File
+): Promise<RecommendedDesign> => {
+  const formData = new FormData();
+  formData.append('image', imageFile);
+  formData.append('title', recData.title);
+  formData.append('description', recData.description);
+  formData.append('access_code', recData.access_code);
+  
+  return uploadFiles<RecommendedDesign>('/recommendations', formData);
 };
 
 export const deleteRecommendation = async (id: number): Promise<void> => {
-    await delay(300);
-    dbDeleteRecommendation(id);
+  await apiCall(`/recommendations/${id}`, { method: 'DELETE' });
 };
 
-// FIX: Use the imported `dbGetAllValidCodes` function to get data, resolving the error.
+// Access Codes API
 export const getValidCodes = async (): Promise<string[]> => {
-  await delay(400);
-  return dbGetAllValidCodes();
+  const codes = await apiCall<{ code: string }[]>('/access-codes');
+  return codes.filter(c => c).map(c => c.code);
 };
 
 export const addCode = async (code: string): Promise<boolean> => {
-  await delay(300);
-  return dbAddCode(code);
+  try {
+    await apiCall('/access-codes', {
+      method: 'POST',
+      body: JSON.stringify({ code: code.trim() }),
+    });
+    return true;
+  } catch (error) {
+    if ((error as Error).message.includes('already exists')) {
+      return false;
+    }
+    throw error;
+  }
 };
 
 export const deleteCode = async (code: string): Promise<void> => {
-  await delay(200);
-  dbDeleteCode(code);
+  await apiCall(`/access-codes/${encodeURIComponent(code)}`, { method: 'DELETE' });
 };
 
-// FIX: Use the imported `dbGetAllValidCodes` function to get data, resolving the error.
 export const validateCode = async (code: string): Promise<boolean> => {
-  await delay(500); // Simulate validating code
-  return dbGetAllValidCodes().includes(code.trim());
+  try {
+    const result = await apiCall<{ isValid: boolean }>('/access-codes/validate', {
+      method: 'POST',
+      body: JSON.stringify({ code: code.trim() }),
+    });
+    return result.isValid;
+  } catch (error) {
+    return false;
+  }
 };
 
+// Submissions API
 export const addSubmission = async (submissionData: AddSubmissionData): Promise<Submission> => {
-    await delay(1000); // Simulate sending data
-    return dbAddSubmission(submissionData);
+  const formData = new FormData();
+  
+  // Add text data
+  formData.append('access_code', submissionData.accessCode);
+  formData.append('comment', submissionData.comment);
+  
+  // Add generated image as base64
+  formData.append('generated_image_base64', submissionData.generatedImageUrl);
+  
+  // Add original images
+  submissionData.originalImageFiles.forEach((file, index) => {
+    formData.append('originalImages', file);
+  });
+  
+  return uploadFiles<Submission>('/submissions', formData);
 };
 
 export const getAllSubmissions = async (): Promise<Submission[]> => {
-    await delay(600);
-    return dbGetAllSubmissions();
+  return apiCall<Submission[]>('/submissions');
 };
 
+// Cleanup function (no longer needed for database version)
 export const cleanupBlobUrls = () => {
-  dbCleanupBlobUrls();
-}
+  // No-op for database version
+};

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { RecommendedDesign, Submission } from '../data/mockDb';
+import { RecommendedDesign, Submission } from '../services/apiService';
 import * as api from '../services/apiService';
 import { ChevronLeftIcon } from './icons/ChevronLeftIcon';
 import { TrashIcon } from './icons/TrashIcon';
@@ -31,7 +31,7 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onNavigateBack }) => {
             ]);
             setRecommendations(recs.sort((a, b) => b.id - a.id));
             setCodes(codesData);
-            setSubmissions(subs.sort((a,b) => b.timestamp.getTime() - a.timestamp.getTime()));
+            setSubmissions(subs.sort((a,b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()));
             if (codesData.length > 0 && newRecAccessCode === '') {
                 setNewRecAccessCode(codesData[0]);
             }
@@ -51,7 +51,7 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onNavigateBack }) => {
         if (!newRecFile || !newRecTitle || !newRecDesc || !newRecAccessCode) return;
 
         const form = e.target as HTMLFormElement;
-        const newRec = await api.addRecommendation({ title: newRecTitle, description: newRecDesc, accessCode: newRecAccessCode }, newRecFile);
+        const newRec = await api.addRecommendation({ title: newRecTitle, description: newRecDesc, access_code: newRecAccessCode }, newRecFile);
         
         setRecommendations(prev => [newRec, ...prev]);
 
@@ -162,11 +162,11 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onNavigateBack }) => {
                                     {recommendations.map(rec => (
                                         <div key={rec.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border">
                                             <div className="flex items-center gap-3 overflow-hidden">
-                                                <img src={rec.imageUrl} alt={rec.title} className="w-12 h-12 object-cover rounded-md bg-gray-200 flex-shrink-0" />
+                                                <img src={rec.image_url} alt={rec.title} className="w-12 h-12 object-cover rounded-md bg-gray-200 flex-shrink-0" />
                                                 <div className="overflow-hidden">
                                                     <p className="font-semibold text-sm truncate">{rec.title}</p>
                                                     <p className="text-xs text-gray-500 truncate">{rec.description}</p>
-                                                    <p className="text-xs text-blue-600 font-mono bg-blue-100 px-1.5 py-0.5 rounded-full inline-block mt-1">{rec.accessCode}</p>
+                                                    <p className="text-xs text-blue-600 font-mono bg-blue-100 px-1.5 py-0.5 rounded-full inline-block mt-1">{rec.access_code}</p>
                                                 </div>
                                             </div>
                                             <button onClick={() => handleDeleteRecommendation(rec.id)} aria-label={`Delete ${rec.title}`} className="flex-shrink-0 ml-2 p-1">
@@ -211,8 +211,8 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onNavigateBack }) => {
                                         {submissions.map(sub => (
                                             <div key={sub.id} className="p-4 border rounded-lg bg-gray-50/80">
                                                 <div className="flex justify-between items-center mb-3 border-b pb-2">
-                                                    <p className="font-semibold">Access Code: <span className="font-mono bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-sm">{sub.accessCode}</span></p>
-                                                    <p className="text-sm text-gray-500">{new Date(sub.timestamp).toLocaleString()}</p>
+                                                    <p className="font-semibold">Access Code: <span className="font-mono bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-sm">{sub.access_code}</span></p>
+                                                    <p className="text-sm text-gray-500">{new Date(sub.created_at).toLocaleString()}</p>
                                                 </div>
                                                 
                                                 {sub.comment && (
@@ -224,8 +224,8 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onNavigateBack }) => {
                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                     <div>
                                                         <h4 className="font-medium text-center mb-2 text-gray-700">Original Image(s)</h4>
-                                                        <div className={`grid ${sub.originalImageUrls.length > 1 ? 'grid-cols-2' : 'grid-cols-1'} gap-2 bg-gray-200 p-2 rounded-lg`}>
-                                                            {sub.originalImageUrls.map((url, index) => (
+                                                        <div className={`grid ${sub.original_images.length > 1 ? 'grid-cols-2' : 'grid-cols-1'} gap-2 bg-gray-200 p-2 rounded-lg`}>
+                                                            {sub.original_images.map((url, index) => (
                                                                 <a href={url} target="_blank" rel="noopener noreferrer" key={index} className="block aspect-square">
                                                                     <img src={url} alt={`Original ${index + 1}`} className="w-full h-full object-contain bg-white rounded" />
                                                                 </a>
@@ -235,8 +235,8 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onNavigateBack }) => {
                                                     <div>
                                                         <h4 className="font-medium text-center mb-2 text-gray-700">Generated Image</h4>
                                                         <div className="bg-gray-200 p-2 rounded-lg aspect-square">
-                                                            <a href={sub.generatedImageUrl} target="_blank" rel="noopener noreferrer">
-                                                                <img src={sub.generatedImageUrl} alt="Generated" className="w-full h-full object-contain bg-white rounded" />
+                                                            <a href={sub.generated_image_url} target="_blank" rel="noopener noreferrer">
+                                                                <img src={sub.generated_image_url} alt="Generated" className="w-full h-full object-contain bg-white rounded" />
                                                             </a>
                                                         </div>
                                                     </div>

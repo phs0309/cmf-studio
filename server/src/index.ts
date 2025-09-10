@@ -1,0 +1,111 @@
+import express from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import { join } from 'path';
+import { existsSync, mkdirSync } from 'fs';
+
+// Load environment variables
+dotenv.config();
+
+// Import routes
+import recommendationsRouter from './routes/recommendations';
+import submissionsRouter from './routes/submissions';
+import accessCodesRouter from './routes/accessCodes';
+
+// Import database connection (this will initialize the database)
+import { database } from './database/connection';
+
+const app = express();
+const PORT = process.env.PORT || 3001;
+
+// Middleware
+app.use(cors({
+  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  credentials: true
+}));
+
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+
+// Create uploads directory if it doesn't exist
+const uploadsDir = process.env.NODE_ENV === 'production' 
+  ? '/tmp/uploads' 
+  : join(__dirname, '..', 'uploads');
+
+if (!existsSync(uploadsDir)) {
+  mkdirSync(uploadsDir, { recursive: true });
+}
+
+// Serve static files from uploads directory
+app.use('/uploads', express.static(uploadsDir));
+
+// API Routes
+app.use('/api/recommendations', recommendationsRouter);
+app.use('/api/submissions', submissionsRouter);
+app.use('/api/access-codes', accessCodesRouter);
+
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.json({
+    success: true,
+    data: {
+      status: 'OK',
+      timestamp: new Date().toISOString(),
+      service: 'CMF Studio API'
+    }
+  });
+});
+
+// Error handling middleware
+app.use((error: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  console.error('Unhandled error:', error);
+  
+  if (error.code === 'LIMIT_FILE_SIZE') {
+    return res.status(413).json({
+      success: false,
+      error: 'File too large. Maximum size is 10MB.'
+    });
+  }
+
+  if (error.message === 'Only image files are allowed') {
+    return res.status(400).json({
+      success: false,
+      error: error.message
+    });
+  }
+
+  res.status(500).json({
+    success: false,
+    error: 'Internal server error'
+  });
+});
+
+// 404 handler
+app.use('*', (req, res) => {
+  res.status(404).json({
+    success: false,
+    error: 'Endpoint not found'
+  });
+});
+
+// Start server
+app.listen(PORT, () => {
+  console.log(`🚀 CMF Studio API server running on port ${PORT}`);
+  console.log(`📁 Uploads directory: ${uploadsDir}`);
+  console.log(`🌐 Client URL: ${process.env.CLIENT_URL || 'http://localhost:5173'}`);
+});
+
+// Graceful shutdown
+process.on('SIGINT', async () => {
+  console.log('🛑 Shutting down gracefully...');
+  try {
+    await database.close();
+    console.log('📦 Database connection closed');
+    process.exit(0);
+  } catch (error) {
+    console.error('Error during shutdown:', error);
+    process.exit(1);
+  }
+});
+
+export default app;
