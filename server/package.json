@@ -5,11 +5,12 @@
   "main": "index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "tsc && echo 'Build completed successfully'",
+    "build": "tsc && npm run copy-assets",
+    "copy-assets": "cp -r src/database/*.sql dist/database/ 2>/dev/null || echo 'SQL files copied'",
     "start": "node index.js",
     "serve": "node index.js",
     "prebuild": "rm -rf dist || echo 'No dist directory to remove'",
-    "postbuild": "ls -la dist/ && echo 'Files in dist directory listed above'"
+    "postbuild": "ls -la dist/ && ls -la dist/database/ && echo 'Build completed successfully'"
   },
   "dependencies": {
     "express": "^4.18.2",

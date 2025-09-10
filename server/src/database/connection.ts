@@ -1,6 +1,6 @@
 import sqlite3 from 'sqlite3';
-import { readFileSync } from 'fs';
 import { join } from 'path';
+const { SCHEMA_SQL } = require('./schema.js');
 
 export class Database {
     private db!: sqlite3.Database;
@@ -36,8 +36,7 @@ export class Database {
     }
 
     private initializeSchema() {
-        const schema = readFileSync(join(__dirname, 'schema.sql'), 'utf8');
-        this.db.exec(schema, (err) => {
+        this.db.exec(SCHEMA_SQL, (err) => {
             if (err) {
                 console.error('Error initializing database schema:', err);
             } else {
