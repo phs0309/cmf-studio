@@ -6,15 +6,15 @@ export class Database {
     private db!: sqlite3.Database;
 
     constructor() {
-        // Use PostgreSQL URL if available (Render), otherwise SQLite
-        if (process.env.DATABASE_URL) {
-            // For PostgreSQL on Render (future enhancement)
-            // For now, still use SQLite but store in /tmp for Render
-            const dbPath = process.env.NODE_ENV === 'production' 
-                ? '/tmp/cmf_studio.db'  // Render uses /tmp for writable storage
-                : join(__dirname, '..', '..', 'data', 'cmf_studio.db');
-            this.initSQLite(dbPath);
+        // For Render, use in-memory database to avoid filesystem issues
+        // In production with persistent storage, this would be a real file
+        const isRender = process.env.RENDER || process.env.NODE_ENV === 'production';
+        
+        if (isRender) {
+            // Use in-memory SQLite database for Render
+            this.initSQLite(':memory:');
         } else {
+            // Local development - use file-based database
             const dbPath = join(__dirname, '..', '..', 'data', 'cmf_studio.db');
             this.initSQLite(dbPath);
         }
@@ -27,7 +27,7 @@ export class Database {
                     console.error('Error opening database:', err);
                     process.exit(1);
                 }
-                console.log(`Connected to SQLite database at: ${dbPath}`);
+                console.log(`Connected to SQLite database at: ${dbPath === ':memory:' ? 'in-memory' : dbPath}`);
                 this.initializeSchema();
             });
 
