@@ -17,6 +17,7 @@
     "cors": "^2.8.5",
     "multer": "^1.4.5-lts.1",
     "sqlite3": "^5.1.6",
+    "pg": "^8.11.3",
     "dotenv": "^16.3.1",
     "bcryptjs": "^2.4.3",
     "jsonwebtoken": "^9.0.2",
@@ -26,7 +27,8 @@
     "@types/multer": "^1.4.11",
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.5",
-    "@types/node": "^20.0.0"
+    "@types/node": "^20.0.0",
+    "@types/pg": "^8.10.9"
   },
   "devDependencies": {
     "tsx": "^4.7.0"
