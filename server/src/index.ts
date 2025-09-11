@@ -39,6 +39,12 @@ if (!existsSync(uploadsDir)) {
 // Serve static files from uploads directory
 app.use('/uploads', express.static(uploadsDir));
 
+// Serve frontend static files in production
+if (process.env.NODE_ENV === 'production') {
+  const frontendPath = join(__dirname, '..', '..', 'dist');
+  app.use(express.static(frontendPath));
+}
+
 // API Routes
 app.use('/api/recommendations', recommendationsRouter);
 app.use('/api/submissions', submissionsRouter);
@@ -80,12 +86,17 @@ app.use((error: any, req: express.Request, res: express.Response, next: express.
   });
 });
 
-// 404 handler
+// 404 handler - serve frontend for client-side routing in production
 app.use('*', (req, res) => {
-  res.status(404).json({
-    success: false,
-    error: 'Endpoint not found'
-  });
+  if (process.env.NODE_ENV === 'production') {
+    const frontendPath = join(__dirname, '..', '..', 'dist', 'index.html');
+    res.sendFile(frontendPath);
+  } else {
+    res.status(404).json({
+      success: false,
+      error: 'Endpoint not found'
+    });
+  }
 });
 
 // Start server
