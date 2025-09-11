@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { RecommendedDesign, Submission } from '../services/apiService';
 import * as api from '../services/apiService';
+import { testApi, testPostApi } from '../services/apiService';
 import { ChevronLeftIcon } from './icons/ChevronLeftIcon';
 import { TrashIcon } from './icons/TrashIcon';
 
@@ -132,6 +133,34 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onNavigateBack }) => {
                     </div>
                 ) : (
                     <>
+                        {/* API Test Section */}
+                        <div className="mb-8 bg-yellow-50 p-6 rounded-xl border border-yellow-200">
+                            <h2 className="text-lg font-semibold text-yellow-800 mb-4">API Connectivity Test</h2>
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={async () => {
+                                        console.log('Testing GET API...');
+                                        await testApi();
+                                    }}
+                                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                                >
+                                    Test GET API
+                                </button>
+                                <button
+                                    onClick={async () => {
+                                        console.log('Testing POST API...');
+                                        await testPostApi();
+                                    }}
+                                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                                >
+                                    Test POST API
+                                </button>
+                            </div>
+                            <p className="text-sm text-yellow-700 mt-3">
+                                Open browser console (F12) to see detailed API test results.
+                            </p>
+                        </div>
+                        
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
                             {/* Manage Recommendations */}
                             <div className="space-y-6 bg-white p-8 rounded-xl border border-gray-200/80 shadow-sm">

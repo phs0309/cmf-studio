@@ -44,27 +44,42 @@ const apiCall = async <T>(
   endpoint: string, 
   options: RequestInit = {}
 ): Promise<T> => {
-  console.log(`API Call: ${options.method || 'GET'} ${API_BASE_URL}${endpoint}`);
-  console.log('Request options:', options);
+  const fullUrl = `${API_BASE_URL}${endpoint}`;
+  console.log(`🌐 API Call: ${options.method || 'GET'} ${fullUrl}`);
+  console.log('📤 Request options:', options);
   
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
-    ...options,
-  });
+  try {
+    const response = await fetch(fullUrl, {
+      headers: {
+        'Content-Type': 'application/json',
+        ...options.headers,
+      },
+      ...options,
+    });
 
-  console.log('Response status:', response.status);
-  
-  const result: ApiResponse<T> = await response.json();
-  console.log('Response data:', result);
-  
-  if (!result.success || !response.ok) {
-    throw new Error(result.error || 'API call failed');
+    console.log('📥 Response status:', response.status);
+    console.log('📥 Response headers:', Object.fromEntries(response.headers.entries()));
+    
+    if (!response.ok) {
+      console.error('❌ HTTP Error:', response.status, response.statusText);
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    
+    const result: ApiResponse<T> = await response.json();
+    console.log('📄 Response data:', result);
+    
+    if (!result.success) {
+      throw new Error(result.error || 'API call failed');
+    }
+    
+    return result.data as T;
+  } catch (error) {
+    console.error('🚨 Fetch Error:', error);
+    if (error instanceof TypeError && error.message.includes('fetch')) {
+      throw new Error('Network error: Unable to connect to server');
+    }
+    throw error;
   }
-  
-  return result.data as T;
 };
 
 // Helper function for file uploads
@@ -175,4 +190,31 @@ export const getAllSubmissions = async (): Promise<Submission[]> => {
 // Cleanup function (no longer needed for database version)
 export const cleanupBlobUrls = () => {
   // No-op for database version
+};
+
+// Test API connectivity
+export const testApi = async (): Promise<boolean> => {
+  try {
+    await apiCall('/test');
+    console.log('✅ API test successful');
+    return true;
+  } catch (error) {
+    console.error('❌ API test failed:', error);
+    return false;
+  }
+};
+
+// Test POST API
+export const testPostApi = async (): Promise<boolean> => {
+  try {
+    await apiCall('/test', {
+      method: 'POST',
+      body: JSON.stringify({ test: 'data' })
+    });
+    console.log('✅ POST API test successful');
+    return true;
+  } catch (error) {
+    console.error('❌ POST API test failed:', error);
+    return false;
+  }
 };

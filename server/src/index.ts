@@ -83,6 +83,32 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// Test endpoint for debugging
+app.get('/api/test', (req, res) => {
+  res.json({
+    success: true,
+    data: {
+      message: 'API is working!',
+      timestamp: new Date().toISOString(),
+      headers: req.headers,
+      url: req.url,
+      method: req.method
+    }
+  });
+});
+
+// Test POST endpoint
+app.post('/api/test', (req, res) => {
+  res.json({
+    success: true,
+    data: {
+      message: 'POST API is working!',
+      body: req.body,
+      timestamp: new Date().toISOString()
+    }
+  });
+});
+
 // Error handling middleware
 app.use((error: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
   console.error('Unhandled error:', error);
