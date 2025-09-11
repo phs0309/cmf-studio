@@ -38,6 +38,9 @@ const apiCall = async <T>(
   endpoint: string, 
   options: RequestInit = {}
 ): Promise<T> => {
+  console.log(`API Call: ${options.method || 'GET'} ${API_BASE_URL}${endpoint}`);
+  console.log('Request options:', options);
+  
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
     headers: {
       'Content-Type': 'application/json',
@@ -46,7 +49,10 @@ const apiCall = async <T>(
     ...options,
   });
 
+  console.log('Response status:', response.status);
+  
   const result: ApiResponse<T> = await response.json();
+  console.log('Response data:', result);
   
   if (!result.success || !response.ok) {
     throw new Error(result.error || 'API call failed');

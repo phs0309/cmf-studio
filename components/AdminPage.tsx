@@ -75,12 +75,19 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onNavigateBack }) => {
         e.preventDefault();
         const codeToAdd = newCode.trim();
         if (!codeToAdd) return;
-        const success = await api.addCode(codeToAdd);
-        if (success) {
-            setCodes(prev => [...prev, codeToAdd]);
-            setNewCode('');
-        } else {
-            alert(`Code "${codeToAdd}" already exists.`);
+        
+        try {
+            const success = await api.addCode(codeToAdd);
+            if (success) {
+                setCodes(prev => [...prev, codeToAdd]);
+                setNewCode('');
+                alert(`Code "${codeToAdd}" added successfully!`);
+            } else {
+                alert(`Code "${codeToAdd}" already exists.`);
+            }
+        } catch (error) {
+            console.error('Error adding code:', error);
+            alert(`Failed to add code: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
     };
 
