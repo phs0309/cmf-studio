@@ -41,7 +41,7 @@ app.use('/uploads', express.static(uploadsDir));
 
 // Serve frontend static files in production
 if (process.env.NODE_ENV === 'production') {
-  const frontendPath = join(__dirname, '..', '..', 'dist');
+  const frontendPath = join(__dirname, '..', '..', '..', 'dist');
   app.use(express.static(frontendPath));
 }
 
@@ -89,7 +89,7 @@ app.use((error: any, req: express.Request, res: express.Response, next: express.
 // 404 handler - serve frontend for client-side routing in production
 app.use('*', (req, res) => {
   if (process.env.NODE_ENV === 'production') {
-    const frontendPath = join(__dirname, '..', '..', 'dist', 'index.html');
+    const frontendPath = join(__dirname, '..', '..', '..', 'dist', 'index.html');
     res.sendFile(frontendPath);
   } else {
     res.status(404).json({
