@@ -41,8 +41,29 @@ app.use('/uploads', express.static(uploadsDir));
 
 // Serve frontend static files in production
 if (process.env.NODE_ENV === 'production') {
-  const frontendPath = join(__dirname, '..', '..', 'dist');
-  app.use(express.static(frontendPath));
+  // Try multiple possible paths for the frontend dist folder
+  const possiblePaths = [
+    join(__dirname, '..', '..', 'dist'),           // /opt/render/project/dist
+    join(__dirname, '..', '..', '..', 'dist'),     // /opt/render/project/src/dist
+    join(__dirname, '..', '..', '..', '..', 'dist') // /opt/render/project/dist
+  ];
+  
+  let frontendPath = '';
+  for (const path of possiblePaths) {
+    if (existsSync(path)) {
+      frontendPath = path;
+      console.log(`✅ Found frontend files at: ${frontendPath}`);
+      break;
+    } else {
+      console.log(`❌ Frontend files not found at: ${path}`);
+    }
+  }
+  
+  if (frontendPath) {
+    app.use(express.static(frontendPath));
+  } else {
+    console.error('⚠️ Frontend files not found in any expected location');
+  }
 }
 
 // API Routes
@@ -89,8 +110,29 @@ app.use((error: any, req: express.Request, res: express.Response, next: express.
 // 404 handler - serve frontend for client-side routing in production
 app.use('*', (req, res) => {
   if (process.env.NODE_ENV === 'production') {
-    const frontendPath = join(__dirname, '..', '..', 'dist', 'index.html');
-    res.sendFile(frontendPath);
+    // Try multiple possible paths for index.html
+    const possibleIndexPaths = [
+      join(__dirname, '..', '..', 'dist', 'index.html'),
+      join(__dirname, '..', '..', '..', 'dist', 'index.html'),
+      join(__dirname, '..', '..', '..', '..', 'dist', 'index.html')
+    ];
+    
+    let indexPath = '';
+    for (const path of possibleIndexPaths) {
+      if (existsSync(path)) {
+        indexPath = path;
+        break;
+      }
+    }
+    
+    if (indexPath) {
+      res.sendFile(indexPath);
+    } else {
+      res.status(404).json({
+        success: false,
+        error: 'Frontend not found'
+      });
+    }
   } else {
     res.status(404).json({
       success: false,
