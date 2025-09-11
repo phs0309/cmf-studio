@@ -1,11 +1,19 @@
-// API Configuration - Render Backend
-const API_BASE_URL = import.meta.env.VITE_API_URL || (
-  typeof window !== 'undefined' ? `${window.location.origin}/api` : '/api'
-);
+// API Configuration - Force relative API URL for production
+const getApiBaseUrl = () => {
+  // Always use relative path in production to avoid CORS issues
+  if (typeof window !== 'undefined' && window.location.hostname.includes('onrender.com')) {
+    return '/api';
+  }
+  // Use environment variable or relative path as fallback
+  return import.meta.env.VITE_API_URL || '/api';
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 // Debug: Log the API URL being used
-console.log('API_BASE_URL:', API_BASE_URL);
-console.log('VITE_API_URL env var:', import.meta.env.VITE_API_URL);
+console.log('🔧 API_BASE_URL:', API_BASE_URL);
+console.log('🔧 VITE_API_URL env var:', import.meta.env.VITE_API_URL);
+console.log('🔧 Window location:', typeof window !== 'undefined' ? window.location.href : 'N/A');
 
 // Types
 export interface RecommendedDesign {
