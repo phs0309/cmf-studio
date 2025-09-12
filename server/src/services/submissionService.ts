@@ -56,32 +56,46 @@ export class SubmissionService {
 
   async create(data: AddSubmissionRequest, originalImageUrls: string[]): Promise<Submission> {
     try {
+      console.log('=== SubmissionService.create started ===');
+      console.log('Data:', data);
+      console.log('Original image URLs count:', originalImageUrls.length);
+      console.log('DATABASE_URL present:', !!process.env.DATABASE_URL);
+      
       // Insert submission - handle PostgreSQL and SQLite differently for ID retrieval
       let submissionId: number;
       
       if (process.env.DATABASE_URL) {
+        console.log('=== Using PostgreSQL ===');
         // PostgreSQL - use RETURNING clause
         const result = await database.query(
           `INSERT INTO submissions (access_code, comment, generated_image_url) 
            VALUES ($1, $2, $3) RETURNING id`,
           [data.access_code, data.comment, data.generated_image_url]
         );
+        console.log('PostgreSQL INSERT result:', result);
         submissionId = result[0].id;
+        console.log('New submission ID:', submissionId);
       } else {
+        console.log('=== Using SQLite ===');
         // SQLite
         const submissionResult = await database.run(
           `INSERT INTO submissions (access_code, comment, generated_image_url) 
            VALUES (?, ?, ?)`,
           [data.access_code, data.comment, data.generated_image_url]
         );
+        console.log('SQLite INSERT result:', submissionResult);
         submissionId = submissionResult.lastID;
+        console.log('New submission ID:', submissionId);
       }
 
       // Insert original images
       if (originalImageUrls.length > 0) {
+        console.log('=== Inserting original images ===');
         if (process.env.DATABASE_URL) {
           // PostgreSQL - use $1, $2, $3 placeholders
+          console.log('Using PostgreSQL for image inserts');
           const imageInserts = originalImageUrls.map((url, index) => {
+            console.log(`Inserting image ${index}:`, url);
             return database.query(
               `INSERT INTO submission_images (submission_id, image_url, image_order) 
                VALUES ($1, $2, $3)`,
@@ -89,9 +103,12 @@ export class SubmissionService {
             );
           });
           await Promise.all(imageInserts);
+          console.log('All images inserted successfully');
         } else {
           // SQLite - use ? placeholders
+          console.log('Using SQLite for image inserts');
           const imageInserts = originalImageUrls.map((url, index) => {
+            console.log(`Inserting image ${index}:`, url);
             return database.run(
               `INSERT INTO submission_images (submission_id, image_url, image_order) 
                VALUES (?, ?, ?)`,
@@ -99,13 +116,18 @@ export class SubmissionService {
             );
           });
           await Promise.all(imageInserts);
+          console.log('All images inserted successfully');
         }
+      } else {
+        console.log('No original images to insert');
       }
 
       // Return the created submission with images
+      console.log('=== Fetching created submission ===');
       let newSubmission;
       if (process.env.DATABASE_URL) {
         // PostgreSQL
+        console.log('Fetching submission with PostgreSQL');
         const result = await database.query(
           `SELECT s.id, s.access_code, s.comment, s.generated_image_url,
                   s.created_at
@@ -113,9 +135,11 @@ export class SubmissionService {
            WHERE s.id = $1`,
           [submissionId]
         );
+        console.log('PostgreSQL SELECT result:', result);
         newSubmission = result[0];
       } else {
         // SQLite
+        console.log('Fetching submission with SQLite');
         newSubmission = await database.get(
           `SELECT s.id, s.access_code, s.comment, s.generated_image_url,
                   datetime(s.created_at, 'localtime') as created_at
@@ -123,13 +147,23 @@ export class SubmissionService {
            WHERE s.id = ?`,
           [submissionId]
         );
+        console.log('SQLite SELECT result:', newSubmission);
       }
 
+      console.log('Adding original images to submission');
       newSubmission.original_images = originalImageUrls;
+      
+      console.log('=== Submission creation completed ===');
+      console.log('Final submission:', newSubmission);
+      
       return newSubmission;
     } catch (error) {
-      console.error('Error creating submission:', error);
-      throw new Error('Failed to create submission');
+      console.error('=== ERROR in SubmissionService.create ===');
+      console.error('Error type:', error?.constructor?.name);
+      console.error('Error message:', error instanceof Error ? error.message : error);
+      console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+      console.error('Full error object:', error);
+      throw new Error(`Failed to create submission: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 
