@@ -18,7 +18,7 @@ export const RecommendationCard: React.FC<RecommendedDesign> = ({
       </div>
       <div className="p-6">
         <h3 className="text-xl font-semibold text-gray-900 mb-2">{title}</h3>
-        <p className="text-base text-gray-600 leading-relaxed">{description}</p>
+        <p className="text-base text-gray-600 leading-relaxed whitespace-pre-line">{description}</p>
       </div>
     </div>
   );
