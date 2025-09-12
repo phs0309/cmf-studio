@@ -61,6 +61,33 @@ export class SubmissionService {
       console.log('Original image URLs count:', originalImageUrls.length);
       console.log('DATABASE_URL present:', !!process.env.DATABASE_URL);
       
+      // Validate access code exists
+      console.log('=== Validating access code ===');
+      let accessCodeExists;
+      if (process.env.DATABASE_URL) {
+        // PostgreSQL
+        const result = await database.query(
+          'SELECT code FROM access_codes WHERE code = $1 AND is_active = true',
+          [data.access_code]
+        );
+        accessCodeExists = result.length > 0;
+        console.log('PostgreSQL access code validation result:', result);
+      } else {
+        // SQLite
+        const result = await database.get(
+          'SELECT code FROM access_codes WHERE code = ? AND is_active = 1',
+          [data.access_code]
+        );
+        accessCodeExists = !!result;
+        console.log('SQLite access code validation result:', result);
+      }
+      
+      if (!accessCodeExists) {
+        console.error('Access code not found or inactive:', data.access_code);
+        throw new Error(`Invalid or inactive access code: ${data.access_code}`);
+      }
+      console.log('Access code validation passed');
+      
       // Insert submission - handle PostgreSQL and SQLite differently for ID retrieval
       let submissionId: number;
       
