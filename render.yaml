@@ -5,6 +5,9 @@ services:
     plan: free
     buildCommand: npm install && npm run build && cd server && npm install && npm run build
     startCommand: node start.js
+    healthCheckPath: /api/health
+    numInstances: 1
+    maxShutdownDelaySeconds: 30
     envVars:
       - key: NODE_VERSION
         value: 20
@@ -12,4 +15,6 @@ services:
         value: production
       - key: RENDER
         value: "true"
+      - key: PORT
+        value: 10000
     autoDeploy: true

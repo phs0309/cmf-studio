@@ -78,8 +78,20 @@ app.get('/api/health', (req, res) => {
     data: {
       status: 'OK',
       timestamp: new Date().toISOString(),
-      service: 'CMF Studio API'
+      service: 'CMF Studio API',
+      uptime: process.uptime(),
+      memory: process.memoryUsage(),
+      env: process.env.NODE_ENV
     }
+  });
+});
+
+// Keep-alive endpoint for Render
+app.get('/api/keep-alive', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Server is alive',
+    timestamp: new Date().toISOString()
   });
 });
 
