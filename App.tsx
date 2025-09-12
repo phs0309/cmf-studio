@@ -226,7 +226,7 @@ const App: React.FC = () => {
                         disabled={!isReadyToGenerate}
                         className="inline-flex items-center justify-center gap-2 text-blue-900 bg-blue-200 hover:bg-blue-300 disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed focus:ring-4 focus:ring-blue-300 font-bold rounded-lg text-base px-6 py-3 text-center transition-colors duration-200"
                         >
-                        Next Step &rarr;
+                        다음 단계 &rarr;
                     </button>
                 </div>
             </div>
@@ -238,14 +238,14 @@ const App: React.FC = () => {
                 <div className="max-w-5xl mx-auto">
                     <div className="space-y-6 bg-white p-8 rounded-xl border border-gray-200/80 shadow-sm">
                          <div className="flex items-center justify-between mb-2">
-                            <h2 className="text-2xl font-semibold text-gray-900">2. Customize & Generate</h2>
+                            <h2 className="text-2xl font-semibold text-gray-900">2. 사용자 정의 및 생성</h2>
                             <button
                                 onClick={goToPrevStep}
                                 className="flex items-center gap-1.5 text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors"
-                                aria-label="Back to image upload"
+                                aria-label="이미지 업로드로 돌아가기"
                             >
                                 <ChevronLeftIcon className="w-4 h-4" />
-                                Back
+                                이전
                             </button>
                         </div>
                         <Controls
@@ -269,8 +269,8 @@ const App: React.FC = () => {
                 {isLoading && (
                 <div className="mt-16 flex flex-col items-center justify-center">
                     <Loader />
-                    <p className="mt-4 text-lg text-gray-700">AI is redesigning your product...</p>
-                    <p className="text-sm text-gray-500">This can take a few moments.</p>
+                    <p className="mt-4 text-lg text-gray-700">AI가 제품을 재디자인 중입니다...</p>
+                    <p className="text-sm text-gray-500">잠시만 기다려주세요.</p>
                 </div>
                 )}
                 
@@ -302,7 +302,7 @@ const App: React.FC = () => {
 
       </main>
       <footer className="text-center py-6 text-gray-500 text-sm">
-        <p>Powered by Gemini API</p>
+        <p>Gemini API 제공</p>
       </footer>
       {showSubmissionModal && (
         <SubmissionModal 

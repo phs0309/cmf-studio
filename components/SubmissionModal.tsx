@@ -18,7 +18,7 @@ export const SubmissionModal: React.FC<SubmissionModalProps> = ({ onClose, onSub
     try {
         await onSubmit(comment);
     } catch (err) {
-        setError(err instanceof Error ? err.message : 'An unknown error occurred.');
+        setError(err instanceof Error ? err.message : '알 수 없는 오류가 발생했습니다.');
         setIsLoading(false);
     }
   };
@@ -33,7 +33,7 @@ export const SubmissionModal: React.FC<SubmissionModalProps> = ({ onClose, onSub
                     생성된 디자인에 대한 설명이나 추가 요청사항을 작성해주세요. 담당자가 확인 후 연락드리겠습니다.
                 </p>
                 <div>
-                    <label htmlFor="submission-comment" className="sr-only">Comment</label>
+                    <label htmlFor="submission-comment" className="sr-only">코멘트</label>
                     <textarea
                         id="submission-comment"
                         value={comment}

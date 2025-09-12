@@ -11,10 +11,10 @@ export const Menu: React.FC<MenuProps> = ({ onStartDesigner, onNavigateToAdmin }
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center font-sans p-4">
       <div className="text-center max-w-2xl mx-auto">
         <h1 className="text-5xl font-bold tracking-tight text-gray-900 sm:text-6xl">
-          AI CMF Designer
+          AI CMF 디자이너
         </h1>
         <p className="mt-6 text-lg leading-8 text-gray-600">
-          Upload a product image, choose a material and color, and let AI generate a new design concept. CMF (Color, Material, Finish) design made easy.
+          제품 이미지를 업로드하고 소재와 색상을 선택하면 AI가 새로운 디자인 컨셉을 생성합니다. CMF(색상, 소재, 마감) 디자인이 쉬워집니다.
         </p>
         <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-6">
           <button
@@ -34,8 +34,8 @@ export const Menu: React.FC<MenuProps> = ({ onStartDesigner, onNavigateToAdmin }
         </div>
       </div>
        <footer className="absolute bottom-0 text-center py-6 text-gray-500 text-sm space-y-2">
-        <button onClick={onNavigateToAdmin} className="text-xs text-gray-400 hover:text-gray-600 transition-colors">Admin Panel</button>
-        <p>Powered by Gemini API</p>
+        <button onClick={onNavigateToAdmin} className="text-xs text-gray-400 hover:text-gray-600 transition-colors">관리자 패널</button>
+        <p>Gemini API 제공</p>
       </footer>
     </div>
   );

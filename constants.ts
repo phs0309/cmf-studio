@@ -1,13 +1,13 @@
 
 export const MATERIALS: string[] = [
-  'Matte Plastic',
-  'Glossy Plastic',
-  'Brushed Aluminum',
-  'Polished Chrome',
-  'Natural Oak Wood',
-  'Carbon Fiber',
-  'Soft-touch Rubber',
-  'Translucent Glass',
-  'Anodized Titanium',
-  'Recycled Fabric'
+  '무광 플라스틱',
+  '유광 플라스틱',
+  '브러시드 알루미늄',
+  '폴리시드 크롬',
+  '천연 오크 우드',
+  '카본 파이버',
+  '소프트터치 러버',
+  '반투명 유리',
+  '양극처리 티타늄',
+  '재활용 패브릭'
 ];

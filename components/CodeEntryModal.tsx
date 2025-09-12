@@ -22,7 +22,7 @@ export const CodeEntryModal: React.FC<CodeEntryModalProps> = ({ onClose, onSucce
     if (isValid) {
       onSuccess(codeToValidate);
     } else {
-      setError('Invalid code. Please try again.');
+      setError('잘못된 코드입니다. 다시 시도해주세요.');
       setIsLoading(false);
     }
   };
@@ -31,11 +31,11 @@ export const CodeEntryModal: React.FC<CodeEntryModalProps> = ({ onClose, onSucce
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={onClose}>
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-md" onClick={(e) => e.stopPropagation()}>
         <div className="p-8">
-          <h2 className="text-2xl font-bold text-gray-900 text-center">Enter Access Code</h2>
-          <p className="text-center text-gray-600 mt-2">Please enter your unique code to proceed.</p>
+          <h2 className="text-2xl font-bold text-gray-900 text-center">접근 코드 입력</h2>
+          <p className="text-center text-gray-600 mt-2">진행하려면 고유 코드를 입력해주세요.</p>
           <form onSubmit={handleSubmit} className="mt-6 space-y-4">
             <div>
-              <label htmlFor="access-code" className="sr-only">Access Code</label>
+              <label htmlFor="access-code" className="sr-only">접근 코드</label>
               <input
                 id="access-code"
                 type="text"
@@ -59,10 +59,10 @@ export const CodeEntryModal: React.FC<CodeEntryModalProps> = ({ onClose, onSucce
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
-                  Verifying...
+                  확인 중...
                 </>
               ) : (
-                'Submit'
+                '제출'
               )}
             </button>
           </form>

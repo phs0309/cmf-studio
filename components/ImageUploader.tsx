@@ -53,12 +53,12 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({ index, onImageUplo
         className={`flex justify-center items-center w-full aspect-square border rounded-lg cursor-pointer transition-colors duration-300 relative overflow-hidden ${isDragging ? 'border-blue-500 bg-blue-50' : 'bg-gray-100 border-gray-300 hover:border-gray-400'}`}
       >
         {previewUrl ? (
-          <img src={previewUrl} alt={`Product preview ${index + 1}`} className="max-h-full max-w-full object-contain" />
+          <img src={previewUrl} alt={`제품 미리보기 ${index + 1}`} className="max-h-full max-w-full object-contain" />
         ) : (
           <div className="flex flex-col items-center justify-center pt-5 pb-6 text-center px-2">
             <UploadIcon className="w-8 h-8 mb-3 text-gray-500" />
             <p className="mb-2 text-sm text-gray-600">
-              <span className="font-semibold text-blue-600">Upload</span> or drop
+              <span className="font-semibold text-blue-600">업로드</span> 또는 드래그
             </p>
             <p className="text-xs text-gray-500">PNG, JPG, WEBP</p>
           </div>

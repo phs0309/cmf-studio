@@ -15,20 +15,20 @@ export const Header: React.FC<HeaderProps> = ({ onNavigateBack }) => {
           <img src={logoUrl} alt="AI CMF Designer Logo" className="h-8" />
           <div>
             <h1 className="text-2xl font-bold tracking-tight text-gray-900">
-              AI CMF Designer
+              AI CMF 디자이너
             </h1>
             <p className="text-sm text-gray-600">
-              Instantly visualize new Color, Material, and Finish combinations for your products.
+              제품의 새로운 색상, 소재, 마감을 즉시 시각화해보세요.
             </p>
           </div>
         </div>
         <button
           onClick={onNavigateBack}
           className="flex items-center gap-1.5 text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors"
-          aria-label="Back to menu"
+          aria-label="메뉴로 돌아가기"
         >
           <ChevronLeftIcon className="w-4 h-4" />
-          Menu
+          메뉴
         </button>
       </div>
     </header>
