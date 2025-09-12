@@ -35,7 +35,10 @@ export class FileUploadService {
     return multer({
       storage,
       limits: {
-        fileSize: 10 * 1024 * 1024, // 10MB limit
+        fileSize: 10 * 1024 * 1024, // 10MB limit for uploaded files
+        fieldSize: 20 * 1024 * 1024, // 20MB limit for form fields (base64 images)
+        fields: 10, // Max number of non-file fields
+        files: 3, // Max number of file fields (originalImages)
       },
       fileFilter: (req, file, cb) => {
         // Accept only image files
