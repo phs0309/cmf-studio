@@ -15,7 +15,7 @@ export const Header: React.FC<HeaderProps> = ({ onNavigateBack }) => {
           <img src={logoUrl} alt="AI CMF Designer Logo" className="h-8" />
           <div>
             <h1 className="text-2xl font-bold tracking-tight text-gray-900">
-              AI CMF 디자이너
+              AI CMF 디자인 스튜디오
             </h1>
             <p className="text-sm text-gray-600">
               제품의 새로운 색상, 소재, 마감을 즉시 시각화해보세요.
