@@ -8,7 +8,7 @@ export const RecommendationCard: React.FC<RecommendedDesign> = ({
 }) => {
   return (
     <div className="bg-white rounded-lg border border-gray-200/80 shadow-sm overflow-hidden transition-shadow hover:shadow-md">
-      <div className="aspect-video bg-gray-100">
+      <div className="aspect-[4/3] md:aspect-[3/2] lg:aspect-[5/3] bg-gray-100">
         <img 
           src={image_url} 
           alt={title} 
@@ -16,9 +16,9 @@ export const RecommendationCard: React.FC<RecommendedDesign> = ({
           loading="lazy"
         />
       </div>
-      <div className="p-4">
-        <h3 className="font-semibold text-gray-900">{title}</h3>
-        <p className="text-sm text-gray-600 mt-1">{description}</p>
+      <div className="p-6">
+        <h3 className="text-xl font-semibold text-gray-900 mb-2">{title}</h3>
+        <p className="text-base text-gray-600 leading-relaxed">{description}</p>
       </div>
     </div>
   );
