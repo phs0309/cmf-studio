@@ -3,7 +3,7 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 
 export class Database {
-    private pool!: Pool;
+    private pool: any;
 
     constructor() {
         this.initPostgreSQL();
@@ -61,7 +61,7 @@ export class Database {
 
     private initSQLiteSchema() {
         const { SCHEMA_SQL } = require('./schema');
-        this.pool.exec(SCHEMA_SQL, (err: any) => {
+        (this.pool as any).exec(SCHEMA_SQL, (err: any) => {
             if (err) {
                 console.error('Error initializing SQLite schema:', err);
             } else {
@@ -101,13 +101,13 @@ export class Database {
         return new Promise((resolve, reject) => {
             if (this.pool && typeof this.pool.end === 'function') {
                 // PostgreSQL pool
-                this.pool.end((err: any) => {
+                this.pool.end((err?: any) => {
                     if (err) reject(err);
                     else resolve();
                 });
             } else if (this.pool && typeof this.pool.close === 'function') {
                 // SQLite database
-                this.pool.close((err: any) => {
+                (this.pool as any).close((err: any) => {
                     if (err) reject(err);
                     else resolve();
                 });
@@ -131,7 +131,7 @@ export class Database {
         } else {
             // SQLite fallback
             return new Promise((resolve, reject) => {
-                this.pool.all(sql, params, (err: any, rows: any) => {
+                (this.pool as any).all(sql, params, (err: any, rows: any) => {
                     if (err) reject(err);
                     else resolve(rows);
                 });
@@ -155,7 +155,7 @@ export class Database {
         } else {
             // SQLite fallback
             return new Promise((resolve, reject) => {
-                this.pool.run(sql, params, function(err: any) {
+                (this.pool as any).run(sql, params, function(this: any, err: any) {
                     if (err) reject(err);
                     else resolve(this);
                 });
@@ -176,7 +176,7 @@ export class Database {
         } else {
             // SQLite fallback
             return new Promise((resolve, reject) => {
-                this.pool.get(sql, params, (err: any, row: any) => {
+                (this.pool as any).get(sql, params, (err: any, row: any) => {
                     if (err) reject(err);
                     else resolve(row);
                 });
