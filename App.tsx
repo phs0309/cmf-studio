@@ -51,14 +51,22 @@ const App: React.FC = () => {
     }
   }, [currentPage, designerStep, userAccessCode]);
 
-  const handleImageUpload = (file: File, index: number) => {
-    if (originalImages[index].previewUrl) {
-        URL.revokeObjectURL(originalImages[index].previewUrl!);
-    }
+  const handleImagesUpload = (files: File[]) => {
+    // Clean up existing URLs
+    originalImages.forEach(image => {
+      if (image.previewUrl) {
+        URL.revokeObjectURL(image.previewUrl);
+      }
+    });
 
-    const newImages = [...originalImages];
-    const previewUrl = URL.createObjectURL(file);
-    newImages[index] = { file, previewUrl };
+    const newImages = Array.from({ length: 3 }, () => ({ file: null, previewUrl: null }));
+    files.forEach((file, index) => {
+      if (index < 3) {
+        const previewUrl = URL.createObjectURL(file);
+        newImages[index] = { file, previewUrl };
+      }
+    });
+    
     setOriginalImages(newImages);
     setGeneratedImage(null);
     setError(null);
@@ -124,6 +132,28 @@ const App: React.FC = () => {
     
     setShowSubmissionModal(false);
     alert('성공적으로 라오닉스에게 전송되었습니다!');
+  };
+
+  const handleEditRecommendation = async (imageUrl: string) => {
+    try {
+      // Convert URL to File object
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      const file = new File([blob], 'recommendation.jpg', { type: blob.type });
+      
+      // Clear existing images and set the recommendation image as the first image
+      const newImages = Array.from({ length: 3 }, () => ({ file: null, previewUrl: null }));
+      const previewUrl = URL.createObjectURL(file);
+      newImages[0] = { file, previewUrl };
+      
+      setOriginalImages(newImages);
+      setGeneratedImage(null);
+      setError(null);
+      setDesignerStep(2);
+    } catch (err) {
+      console.error('Failed to load recommendation image:', err);
+      setError('추천 이미지를 불러오는데 실패했습니다.');
+    }
   };
 
 
@@ -203,7 +233,7 @@ const App: React.FC = () => {
                       </div>
                   ) : (
                       <div className="grid grid-cols-1 gap-8 pt-4">
-                          {recommendations.map(rec => <RecommendationCard key={rec.id} {...rec} />)}
+                          {recommendations.map(rec => <RecommendationCard key={rec.id} {...rec} onEdit={handleEditRecommendation} />)}
                       </div>
                   )}
               </div>
@@ -212,15 +242,11 @@ const App: React.FC = () => {
             <div className="space-y-6 bg-white p-8 rounded-xl border border-gray-200/80 shadow-sm">
                 <h2 className="text-2xl font-semibold text-gray-900">직접 CMF 디자인 하기</h2>
                 <p className="text-base text-gray-600">최대 3개의 제품 이미지를 업로드할 수 있습니다 (예: 다른 각도).</p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 pt-4">
-                    {originalImages.map((image, index) => (
-                        <ImageUploader
-                            key={index}
-                            index={index}
-                            onImageUpload={handleImageUpload}
-                            previewUrl={image.previewUrl}
-                        />
-                    ))}
+                <div className="pt-4">
+                    <ImageUploader
+                        onImagesUpload={handleImagesUpload}
+                        previewUrls={originalImages.map(img => img.previewUrl)}
+                    />
                 </div>
                  <div className="pt-6 text-right">
                     <button
