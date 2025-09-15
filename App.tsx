@@ -145,18 +145,18 @@ const App: React.FC = () => {
   const goToPrevStep = () => setDesignerStep(1);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-teal-600 text-gray-800 font-sans relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-white via-pink-50 to-purple-100 text-gray-800 font-sans relative overflow-hidden">
       {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_25%_25%,_white_2px,_transparent_2px),_radial-gradient(circle_at_75%_75%,_white_2px,_transparent_2px)] bg-[length:60px_60px]"></div>
-        <div className="absolute top-0 left-0 w-full h-full bg-[linear-gradient(45deg,_rgba(255,255,255,0.1)_25%,_transparent_25%),_linear-gradient(-45deg,_rgba(255,255,255,0.1)_25%,_transparent_25%),_linear-gradient(45deg,_transparent_75%,_rgba(255,255,255,0.1)_75%),_linear-gradient(-45deg,_transparent_75%,_rgba(255,255,255,0.1)_75%)] bg-[length:40px_40px]"></div>
+      <div className="absolute inset-0 opacity-20">
+        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_25%_25%,_rgba(219,39,119,0.1)_2px,_transparent_2px),_radial-gradient(circle_at_75%_75%,_rgba(147,51,234,0.1)_2px,_transparent_2px)] bg-[length:60px_60px]"></div>
+        <div className="absolute top-0 left-0 w-full h-full bg-[linear-gradient(45deg,_rgba(236,72,153,0.05)_25%,_transparent_25%),_linear-gradient(-45deg,_rgba(236,72,153,0.05)_25%,_transparent_25%),_linear-gradient(45deg,_transparent_75%,_rgba(236,72,153,0.05)_75%),_linear-gradient(-45deg,_transparent_75%,_rgba(236,72,153,0.05)_75%)] bg-[length:40px_40px]"></div>
       </div>
       
       <Header />
       <main className="container mx-auto px-4 py-12 relative z-10">
         {designerStep === 1 && (
           <div className="max-w-5xl mx-auto space-y-8">
-            <div className="space-y-6 bg-white/95 backdrop-blur-sm p-8 rounded-2xl shadow-2xl border border-white/20">
+            <div className="space-y-6 bg-white/90 backdrop-blur-sm p-8 rounded-2xl shadow-lg border border-pink-100/50">
                 <div className="flex justify-between items-start">
                     <div>
                         <h2 className="text-2xl font-semibold text-gray-900">CMF 디자인 하기</h2>
@@ -164,7 +164,7 @@ const App: React.FC = () => {
                     </div>
                     <div className="text-right">
                         <p className="text-sm text-gray-500">무료 체험</p>
-                        <p className="text-lg font-semibold text-purple-600">
+                        <p className="text-lg font-semibold text-pink-600">
                             {freeUsageCount}/4회 사용
                         </p>
                         {freeUsageCount >= 4 && (
@@ -182,7 +182,7 @@ const App: React.FC = () => {
                     <button
                         onClick={goToNextStep}
                         disabled={!isReadyToGenerate}
-                        className="inline-flex items-center justify-center gap-2 text-white bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed focus:ring-4 focus:ring-purple-300 font-bold rounded-xl text-base px-6 py-3 text-center transition-all duration-200 shadow-lg hover:shadow-xl"
+                        className="inline-flex items-center justify-center gap-2 text-white bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed focus:ring-4 focus:ring-purple-200 font-bold rounded-xl text-base px-6 py-3 text-center transition-all duration-200 shadow-lg hover:shadow-xl"
                         >
                         다음 단계 &rarr;
                     </button>
@@ -194,7 +194,7 @@ const App: React.FC = () => {
         {designerStep === 2 && (
             <>
                 <div className="max-w-5xl mx-auto">
-                    <div className="space-y-6 bg-white/95 backdrop-blur-sm p-8 rounded-2xl shadow-2xl border border-white/20">
+                    <div className="space-y-6 bg-white/90 backdrop-blur-sm p-8 rounded-2xl shadow-lg border border-pink-100/50">
                          <div className="flex items-center justify-between mb-2">
                             <h2 className="text-2xl font-semibold text-gray-900">2. 사용자 정의 및 생성</h2>
                             <button
@@ -254,7 +254,7 @@ const App: React.FC = () => {
         )}
 
       </main>
-      <footer className="text-center py-6 text-white/70 text-sm relative z-10">
+      <footer className="text-center py-6 text-slate-600 text-sm relative z-10">
         <p>Gemini API 제공</p>
       </footer>
     </div>

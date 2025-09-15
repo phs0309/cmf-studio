@@ -85,7 +85,7 @@ export const Controls: React.FC<ControlsProps> = ({
       <button
         onClick={onGenerate}
         disabled={!isReady || isLoading || isLimitReached}
-        className="w-full flex items-center justify-center gap-2 text-white bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed focus:ring-4 focus:ring-purple-300 font-bold rounded-xl text-base px-5 py-3.5 text-center transition-all duration-200 shadow-lg hover:shadow-xl"
+        className="w-full flex items-center justify-center gap-2 text-white bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed focus:ring-4 focus:ring-purple-200 font-bold rounded-xl text-base px-5 py-3.5 text-center transition-all duration-200 shadow-lg hover:shadow-xl"
       >
         {isLoading ? (
           <>
