@@ -4,15 +4,15 @@ const logoUrl = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAaUAAAA0CAYAAAC2P
 
 export const Header: React.FC = () => {
   return (
-    <header className="py-4 bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-50">
+    <header className="py-6 bg-white/10 backdrop-blur-md border-b border-white/20 sticky top-0 z-50">
       <div className="container mx-auto px-4 flex items-center justify-center">
-        <div className="flex items-center gap-4">
-          <img src={logoUrl} alt="AI CMF Designer Logo" className="h-8" />
+        <div className="flex items-center gap-4 text-center">
+          <img src={logoUrl} alt="AI CMF Designer Logo" className="h-10" />
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-gray-900">
+            <h1 className="text-3xl font-bold tracking-tight text-white drop-shadow-lg">
               AI CMF 디자인 스튜디오
             </h1>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-white/80">
               제품의 새로운 색상, 소재, 마감을 즉시 시각화해보세요.
             </p>
           </div>

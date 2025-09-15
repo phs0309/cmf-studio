@@ -37,7 +37,7 @@ export const Controls: React.FC<ControlsProps> = ({
           id="material"
           value={material}
           onChange={(e) => setMaterial(e.target.value)}
-          className="w-full bg-gray-100 border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-3 text-base"
+          className="w-full bg-gray-100 border-gray-300 text-gray-900 rounded-lg focus:ring-purple-500 focus:border-purple-500 block p-3 text-base"
         >
           {MATERIALS.map((mat) => (
             <option key={mat} value={mat}>
@@ -63,7 +63,7 @@ export const Controls: React.FC<ControlsProps> = ({
              type="text"
              value={color}
              onChange={(e) => setColor(e.target.value)}
-             className="w-full bg-gray-100 border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-3 font-mono text-base"
+             className="w-full bg-gray-100 border-gray-300 text-gray-900 rounded-lg focus:ring-purple-500 focus:border-purple-500 block p-3 font-mono text-base"
           />
         </div>
       </div>
@@ -77,7 +77,7 @@ export const Controls: React.FC<ControlsProps> = ({
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           placeholder="예: 가운데 A 로고를 그려줘"
-          className="w-full bg-gray-100 border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-3 text-base resize-none"
+          className="w-full bg-gray-100 border-gray-300 text-gray-900 rounded-lg focus:ring-purple-500 focus:border-purple-500 block p-3 text-base resize-none"
           rows={3}
         />
       </div>
@@ -85,7 +85,7 @@ export const Controls: React.FC<ControlsProps> = ({
       <button
         onClick={onGenerate}
         disabled={!isReady || isLoading || isLimitReached}
-        className="w-full flex items-center justify-center gap-2 text-blue-900 bg-blue-200 hover:bg-blue-300 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed focus:ring-4 focus:ring-blue-200 font-bold rounded-lg text-base px-5 py-3.5 text-center transition-colors duration-200"
+        className="w-full flex items-center justify-center gap-2 text-white bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed focus:ring-4 focus:ring-purple-300 font-bold rounded-xl text-base px-5 py-3.5 text-center transition-all duration-200 shadow-lg hover:shadow-xl"
       >
         {isLoading ? (
           <>
