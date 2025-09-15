@@ -13,7 +13,7 @@ const fileToBase64 = (file: File): Promise<string> =>
     reader.onerror = (error) => reject(error);
   });
 
-export const generateCmfDesign = async (imageFiles: File[], material: string, color: string): Promise<string> => {
+export const generateCmfDesign = async (imageFiles: File[], material: string, color: string, description?: string): Promise<string> => {
   if (!process.env.API_KEY) {
     throw new Error("API_KEY environment variable not set");
   }
@@ -30,10 +30,14 @@ export const generateCmfDesign = async (imageFiles: File[], material: string, co
     },
   }));
 
-  const prompt = `Please redesign the product(s) shown in the image(s). If multiple images are provided, treat them as different views of the same product or a cohesive product line.
+  const basePrompt = `Please redesign the product(s) shown in the image(s). If multiple images are provided, treat them as different views of the same product or a cohesive product line.
 Apply a '${material}' material and finish.
 Change its primary color to the hex code '${color}'.
-Maintain the original product shape, proportions, and background as much as possible. The final output must be only the redesigned product image, with no additional text or commentary.`;
+Maintain the original product shape, proportions, and background as much as possible.`;
+
+  const additionalDescription = description && description.trim() ? `\nAdditional requirements: ${description}` : '';
+  
+  const prompt = `${basePrompt}${additionalDescription}\nThe final output must be only the redesigned product image, with no additional text or commentary.`;
 
   const response = await ai.models.generateContent({
     model: 'gemini-2.5-flash-image-preview',

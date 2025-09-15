@@ -35,6 +35,7 @@ const App: React.FC = () => {
   );
   const [material, setMaterial] = useState<string>(MATERIALS[0]);
   const [color, setColor] = useState<string>('#007aff'); // Apple-like blue
+  const [description, setDescription] = useState<string>('');
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -87,7 +88,7 @@ const App: React.FC = () => {
     setGeneratedImage(null);
 
     try {
-      const newImageBase64 = await generateCmfDesign(uploadedFiles, material, color);
+      const newImageBase64 = await generateCmfDesign(uploadedFiles, material, color, description);
       setGeneratedImage(`data:image/png;base64,${newImageBase64}`);
     } catch (err) {
       console.error(err);
@@ -95,7 +96,7 @@ const App: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [originalImages, material, color]);
+  }, [originalImages, material, color, description]);
   
   const handleRedo = () => {
     setOriginalImages(Array.from({ length: 3 }, () => ({ file: null, previewUrl: null })));
@@ -103,6 +104,7 @@ const App: React.FC = () => {
     setError(null);
     setMaterial(MATERIALS[0]);
     setColor('#007aff');
+    setDescription('');
     setDesignerStep(1);
   };
 
@@ -253,6 +255,8 @@ const App: React.FC = () => {
                         setMaterial={setMaterial}
                         color={color}
                         setColor={setColor}
+                        description={description}
+                        setDescription={setDescription}
                         onGenerate={handleGenerate}
                         isLoading={isLoading}
                         isReady={isReadyToGenerate}

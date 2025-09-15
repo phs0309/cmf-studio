@@ -7,6 +7,8 @@ interface ControlsProps {
   setMaterial: (material: string) => void;
   color: string;
   setColor: (color: string) => void;
+  description: string;
+  setDescription: (description: string) => void;
   onGenerate: () => void;
   isLoading: boolean;
   isReady: boolean;
@@ -17,6 +19,8 @@ export const Controls: React.FC<ControlsProps> = ({
   setMaterial,
   color,
   setColor,
+  description,
+  setDescription,
   onGenerate,
   isLoading,
   isReady,
@@ -60,6 +64,20 @@ export const Controls: React.FC<ControlsProps> = ({
              className="w-full bg-gray-100 border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-3 font-mono text-base"
           />
         </div>
+      </div>
+
+      <div>
+        <label htmlFor="description" className="block text-base font-medium text-gray-800 mb-2">
+          추가 설명 (선택사항)
+        </label>
+        <textarea
+          id="description"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          placeholder="예: 가운데 A 로고를 그려줘"
+          className="w-full bg-gray-100 border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-3 text-base resize-none"
+          rows={3}
+        />
       </div>
 
       <button
