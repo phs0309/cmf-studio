@@ -12,6 +12,7 @@ interface ControlsProps {
   onGenerate: () => void;
   isLoading: boolean;
   isReady: boolean;
+  isLimitReached?: boolean;
 }
 
 export const Controls: React.FC<ControlsProps> = ({
@@ -24,6 +25,7 @@ export const Controls: React.FC<ControlsProps> = ({
   onGenerate,
   isLoading,
   isReady,
+  isLimitReached = false,
 }) => {
   return (
     <div className="space-y-6">
@@ -82,7 +84,7 @@ export const Controls: React.FC<ControlsProps> = ({
 
       <button
         onClick={onGenerate}
-        disabled={!isReady || isLoading}
+        disabled={!isReady || isLoading || isLimitReached}
         className="w-full flex items-center justify-center gap-2 text-blue-900 bg-blue-200 hover:bg-blue-300 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed focus:ring-4 focus:ring-blue-200 font-bold rounded-lg text-base px-5 py-3.5 text-center transition-colors duration-200"
       >
         {isLoading ? (

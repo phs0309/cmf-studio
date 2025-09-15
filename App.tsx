@@ -20,6 +20,7 @@ const App: React.FC = () => {
   const [designerStep, setDesignerStep] = useState<1 | 2>(1);
   const [showCodeModal, setShowCodeModal] = useState<boolean>(false);
   const [userAccessCode, setUserAccessCode] = useState<string | null>(null);
+  const [freeUsageCount, setFreeUsageCount] = useState<number>(0);
   
   // Recommendations state
   const [recommendations, setRecommendations] = useState<RecommendedDesign[]>([]);
@@ -39,6 +40,14 @@ const App: React.FC = () => {
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Initialize free usage count from localStorage
+  useEffect(() => {
+    const savedCount = localStorage.getItem('cmf-free-usage-count');
+    if (savedCount) {
+      setFreeUsageCount(parseInt(savedCount, 10));
+    }
+  }, []);
 
   // Fetch recommendations based on access code
   useEffect(() => {
@@ -91,6 +100,12 @@ const App: React.FC = () => {
       return;
     }
 
+    // Check free usage limit for non-premium users
+    if (!userAccessCode && freeUsageCount >= 4) {
+      setError('무료 체험 횟수(4회)를 모두 사용하셨습니다. 더 많은 체험을 원하시면 프리미엄 액세스 코드를 입력해주세요.');
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
     setGeneratedImage(null);
@@ -98,13 +113,20 @@ const App: React.FC = () => {
     try {
       const newImageBase64 = await generateCmfDesign(uploadedFiles, material, color, description);
       setGeneratedImage(`data:image/png;base64,${newImageBase64}`);
+      
+      // Increment free usage count for non-premium users
+      if (!userAccessCode) {
+        const newCount = freeUsageCount + 1;
+        setFreeUsageCount(newCount);
+        localStorage.setItem('cmf-free-usage-count', newCount.toString());
+      }
     } catch (err) {
       console.error(err);
       setError(err instanceof Error ? err.message : 'An unknown error occurred. Please try again.');
     } finally {
       setIsLoading(false);
     }
-  }, [originalImages, material, color, description]);
+  }, [originalImages, material, color, description, userAccessCode, freeUsageCount]);
   
   const handleRedo = () => {
     setOriginalImages(Array.from({ length: 3 }, () => ({ file: null, previewUrl: null })));
@@ -240,8 +262,23 @@ const App: React.FC = () => {
             )}
             
             <div className="space-y-6 bg-white p-8 rounded-xl border border-gray-200/80 shadow-sm">
-                <h2 className="text-2xl font-semibold text-gray-900">직접 CMF 디자인 하기</h2>
-                <p className="text-base text-gray-600">최대 3개의 제품 이미지를 업로드할 수 있습니다 (예: 다른 각도).</p>
+                <div className="flex justify-between items-start">
+                    <div>
+                        <h2 className="text-2xl font-semibold text-gray-900">직접 CMF 디자인 하기</h2>
+                        <p className="text-base text-gray-600">최대 3개의 제품 이미지를 업로드할 수 있습니다 (예: 다른 각도).</p>
+                    </div>
+                    {!userAccessCode && (
+                        <div className="text-right">
+                            <p className="text-sm text-gray-500">무료 체험</p>
+                            <p className="text-lg font-semibold text-blue-600">
+                                {freeUsageCount}/4회 사용
+                            </p>
+                            {freeUsageCount >= 4 && (
+                                <p className="text-xs text-red-500 mt-1">체험 횟수 소진</p>
+                            )}
+                        </div>
+                    )}
+                </div>
                 <div className="pt-4">
                     <ImageUploader
                         onImagesUpload={handleImagesUpload}
@@ -286,6 +323,7 @@ const App: React.FC = () => {
                         onGenerate={handleGenerate}
                         isLoading={isLoading}
                         isReady={isReadyToGenerate}
+                        isLimitReached={!userAccessCode && freeUsageCount >= 4}
                         />
                     </div>
                 </div>
