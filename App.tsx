@@ -24,12 +24,37 @@ const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Initialize free usage count from localStorage
+  // Initialize free usage count from localStorage with 10-minute reset
   useEffect(() => {
-    const savedCount = localStorage.getItem('cmf-free-usage-count');
-    if (savedCount) {
-      setFreeUsageCount(parseInt(savedCount, 10));
-    }
+    const checkAndResetCount = () => {
+      const savedCount = localStorage.getItem('cmf-free-usage-count');
+      const savedTimestamp = localStorage.getItem('cmf-usage-timestamp');
+      const now = Date.now();
+      const tenMinutesInMs = 10 * 60 * 1000; // 10 minutes
+      
+      if (savedTimestamp) {
+        const lastUsage = parseInt(savedTimestamp, 10);
+        // Reset count if 10 minutes have passed
+        if (now - lastUsage > tenMinutesInMs) {
+          setFreeUsageCount(0);
+          localStorage.setItem('cmf-free-usage-count', '0');
+          localStorage.setItem('cmf-usage-timestamp', now.toString());
+        } else if (savedCount) {
+          setFreeUsageCount(parseInt(savedCount, 10));
+        }
+      } else {
+        // First time user - initialize timestamp
+        localStorage.setItem('cmf-usage-timestamp', now.toString());
+      }
+    };
+
+    // Initial check
+    checkAndResetCount();
+
+    // Set up timer to check every minute
+    const interval = setInterval(checkAndResetCount, 60 * 1000); // Check every minute
+    
+    return () => clearInterval(interval);
   }, []);
 
 
@@ -87,10 +112,12 @@ const App: React.FC = () => {
       const newImageBase64 = await generateCmfDesign(uploadedFiles, material, color, description);
       setGeneratedImage(`data:image/png;base64,${newImageBase64}`);
       
-      // Increment free usage count
+      // Increment free usage count and update timestamp
       const newCount = freeUsageCount + 1;
+      const now = Date.now();
       setFreeUsageCount(newCount);
       localStorage.setItem('cmf-free-usage-count', newCount.toString());
+      localStorage.setItem('cmf-usage-timestamp', now.toString());
     } catch (err) {
       console.error(err);
       setError(err instanceof Error ? err.message : 'An unknown error occurred. Please try again.');
