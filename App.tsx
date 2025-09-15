@@ -158,10 +158,18 @@ const App: React.FC = () => {
 
   const handleEditRecommendation = async (imageUrl: string) => {
     try {
-      // Convert URL to File object
-      const response = await fetch(imageUrl);
+      // Use proxy mode to avoid CORS issues
+      const response = await fetch(imageUrl, { 
+        mode: 'cors',
+        credentials: 'omit'
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       const blob = await response.blob();
-      const file = new File([blob], 'recommendation.jpg', { type: blob.type });
+      const file = new File([blob], 'recommendation.jpg', { type: blob.type || 'image/jpeg' });
       
       // Clear existing images and set the recommendation image as the first image
       const newImages = Array.from({ length: 3 }, () => ({ file: null, previewUrl: null }));
@@ -174,7 +182,17 @@ const App: React.FC = () => {
       setDesignerStep(2);
     } catch (err) {
       console.error('Failed to load recommendation image:', err);
-      setError('추천 이미지를 불러오는데 실패했습니다.');
+      // Fallback: try to use the image URL directly as preview
+      try {
+        const newImages = Array.from({ length: 3 }, () => ({ file: null, previewUrl: null }));
+        newImages[0] = { file: null, previewUrl: imageUrl };
+        setOriginalImages(newImages);
+        setGeneratedImage(null);
+        setError(null);
+        setDesignerStep(2);
+      } catch (fallbackErr) {
+        setError('추천 이미지를 불러오는데 실패했습니다. 다른 이미지를 시도해보세요.');
+      }
     }
   };
 

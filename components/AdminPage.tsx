@@ -2,8 +2,10 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { RecommendedDesign, Submission } from '../services/apiService';
 import * as api from '../services/apiService';
 import { testApi, testPostApi } from '../services/apiService';
+import { generateCmfDesign } from '../services/geminiService';
 import { ChevronLeftIcon } from './icons/ChevronLeftIcon';
 import { TrashIcon } from './icons/TrashIcon';
+import { SparklesIcon } from './icons/SparklesIcon';
 
 interface AdminPageProps {
     onNavigateBack: () => void;
@@ -21,6 +23,13 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onNavigateBack }) => {
     const [newRecDesc, setNewRecDesc] = useState('');
     const [newRecAccessCode, setNewRecAccessCode] = useState<string>('');
     const [newCode, setNewCode] = useState('');
+    
+    // New AI synthesis fields
+    const [useAiSynthesis, setUseAiSynthesis] = useState(false);
+    const [designPrompt, setDesignPrompt] = useState('');
+    const [designRationale, setDesignRationale] = useState('');
+    const [aiGeneratedImage, setAiGeneratedImage] = useState<string | null>(null);
+    const [isGeneratingAi, setIsGeneratingAi] = useState(false);
 
     const fetchData = useCallback(async () => {
         try {
@@ -47,22 +56,74 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onNavigateBack }) => {
         fetchData();
     }, [fetchData]);
 
+    const handleGenerateAiImage = async () => {
+        if (!newRecFile || !designPrompt.trim()) {
+            alert('업로드된 이미지와 디자인 프롬프트가 필요합니다.');
+            return;
+        }
+
+        setIsGeneratingAi(true);
+        try {
+            const imageBase64 = await generateCmfDesign([newRecFile], '플라스틱', '#007aff', designPrompt);
+            setAiGeneratedImage(`data:image/png;base64,${imageBase64}`);
+        } catch (err) {
+            console.error('AI 이미지 생성 실패:', err);
+            alert('AI 이미지 생성에 실패했습니다. 다시 시도해주세요.');
+        } finally {
+            setIsGeneratingAi(false);
+        }
+    };
+
+    const dataURLtoFile = (dataurl: string, filename: string): File => {
+        const arr = dataurl.split(',');
+        const mime = arr[0].match(/:(.*?);/)![1];
+        const bstr = atob(arr[1]);
+        let n = bstr.length;
+        const u8arr = new Uint8Array(n);
+        while(n--) {
+            u8arr[n] = bstr.charCodeAt(n);
+        }
+        return new File([u8arr], filename, {type: mime});
+    };
+
     const handleAddRecommendation = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!newRecFile || !newRecTitle || !newRecDesc || !newRecAccessCode) return;
+        
+        let fileToUse = newRecFile;
+        
+        // If using AI synthesis and AI image is generated, use that instead
+        if (useAiSynthesis && aiGeneratedImage) {
+            fileToUse = dataURLtoFile(aiGeneratedImage, 'ai-generated.png');
+        }
+        
+        if (!fileToUse || !newRecTitle || !newRecDesc || !newRecAccessCode) return;
+
+        let finalDescription = newRecDesc;
+        if (useAiSynthesis && designRationale.trim()) {
+            finalDescription += `\n\n디자인 근거: ${designRationale}`;
+        }
 
         const form = e.target as HTMLFormElement;
-        const newRec = await api.addRecommendation({ title: newRecTitle, description: newRecDesc, access_code: newRecAccessCode }, newRecFile);
+        const newRec = await api.addRecommendation({ 
+            title: newRecTitle, 
+            description: finalDescription, 
+            access_code: newRecAccessCode 
+        }, fileToUse);
         
         setRecommendations(prev => [newRec, ...prev]);
 
+        // Reset form
         setNewRecFile(null);
         setNewRecTitle('');
         setNewRecDesc('');
+        setUseAiSynthesis(false);
+        setDesignPrompt('');
+        setDesignRationale('');
+        setAiGeneratedImage(null);
         if (codes.length > 0) {
             setNewRecAccessCode(codes[0]);
         }
-        form.reset(); // Clears the file input
+        form.reset();
     };
     
     const handleDeleteRecommendation = async (id: number) => {
@@ -168,6 +229,22 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onNavigateBack }) => {
                                 {/* Add Form */}
                                 <form onSubmit={handleAddRecommendation} className="p-4 border rounded-lg space-y-3">
                                     <h3 className="font-medium">Add New Recommendation</h3>
+                                    
+                                    {/* AI Synthesis Toggle */}
+                                    <div className="flex items-center gap-2 p-3 bg-purple-50 rounded-lg">
+                                        <input 
+                                            type="checkbox" 
+                                            id="use-ai" 
+                                            checked={useAiSynthesis}
+                                            onChange={e => setUseAiSynthesis(e.target.checked)}
+                                            className="rounded"
+                                        />
+                                        <label htmlFor="use-ai" className="text-sm font-medium text-purple-800">
+                                            AI 합성 기능 사용
+                                        </label>
+                                        <SparklesIcon className="w-4 h-4 text-purple-600" />
+                                    </div>
+
                                     <div>
                                         <label htmlFor="rec-image" className="sr-only">Image File</label>
                                         <input 
@@ -179,6 +256,70 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onNavigateBack }) => {
                                             required 
                                         />
                                     </div>
+
+                                    {/* AI Synthesis Fields */}
+                                    {useAiSynthesis && (
+                                        <div className="space-y-3 p-3 bg-purple-50 rounded-lg border border-purple-200">
+                                            <div>
+                                                <label htmlFor="design-prompt" className="block text-sm font-medium text-gray-700 mb-1">
+                                                    디자이너 의도 프롬프트
+                                                </label>
+                                                <textarea 
+                                                    id="design-prompt"
+                                                    value={designPrompt} 
+                                                    onChange={e => setDesignPrompt(e.target.value)} 
+                                                    placeholder="예: 미래적이고 세련된 느낌으로 메탈릭 소재를 적용하여 프리미엄한 느낌을 강조해줘"
+                                                    className="w-full bg-white border-gray-300 rounded-md p-2 text-sm" 
+                                                    rows={3} 
+                                                    required={useAiSynthesis}
+                                                />
+                                            </div>
+
+                                            <button 
+                                                type="button"
+                                                onClick={handleGenerateAiImage}
+                                                disabled={isGeneratingAi || !newRecFile || !designPrompt.trim()}
+                                                className="w-full flex items-center justify-center gap-2 text-purple-900 bg-purple-200 hover:bg-purple-300 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed font-bold rounded-lg text-sm px-4 py-2 text-center transition-colors"
+                                            >
+                                                {isGeneratingAi ? (
+                                                    <>
+                                                        <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                        </svg>
+                                                        AI 이미지 생성 중...
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <SparklesIcon className="w-4 h-4" />
+                                                        AI 이미지 생성
+                                                    </>
+                                                )}
+                                            </button>
+
+                                            {aiGeneratedImage && (
+                                                <div className="mt-3">
+                                                    <p className="text-sm font-medium text-gray-700 mb-2">생성된 AI 이미지:</p>
+                                                    <img src={aiGeneratedImage} alt="AI Generated" className="w-full max-w-xs mx-auto rounded-lg border" />
+                                                </div>
+                                            )}
+
+                                            <div>
+                                                <label htmlFor="design-rationale" className="block text-sm font-medium text-gray-700 mb-1">
+                                                    디자인 근거 설명
+                                                </label>
+                                                <textarea 
+                                                    id="design-rationale"
+                                                    value={designRationale} 
+                                                    onChange={e => setDesignRationale(e.target.value)} 
+                                                    placeholder="이 디자인을 선택한 이유와 CMF 적용 근거를 설명해주세요..."
+                                                    className="w-full bg-white border-gray-300 rounded-md p-2 text-sm" 
+                                                    rows={3}
+                                                />
+                                            </div>
+                                        </div>
+                                    )}
+
                                     <input type="text" value={newRecTitle} onChange={e => setNewRecTitle(e.target.value)} placeholder="Title" className="w-full bg-gray-100 border-gray-300 rounded-md p-2 text-sm" required />
                                     <textarea value={newRecDesc} onChange={e => setNewRecDesc(e.target.value)} placeholder="Description" className="w-full bg-gray-100 border-gray-300 rounded-md p-2 text-sm" rows={2} required />
                                     <div>

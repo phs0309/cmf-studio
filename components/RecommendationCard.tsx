@@ -29,7 +29,7 @@ export const RecommendationCard: React.FC<RecommendationCardProps> = ({
             onClick={() => onEdit(image_url)}
             className="w-full text-blue-900 bg-blue-200 hover:bg-blue-300 focus:ring-4 focus:ring-blue-200 font-bold rounded-lg text-base px-4 py-2 text-center transition-colors duration-200"
           >
-            이 디자인 수정하기
+            디자인 수정하기
           </button>
         )}
       </div>
