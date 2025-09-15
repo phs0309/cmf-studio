@@ -145,18 +145,18 @@ const App: React.FC = () => {
   const goToPrevStep = () => setDesignerStep(1);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white via-pink-200 to-purple-300 text-gray-800 font-sans relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-white from-10% via-pink-300 via-60% to-purple-400 to-90% text-gray-800 font-sans relative overflow-hidden">
       {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-25">
-        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_25%_25%,_rgba(219,39,119,0.2)_2px,_transparent_2px),_radial-gradient(circle_at_75%_75%,_rgba(147,51,234,0.2)_2px,_transparent_2px)] bg-[length:60px_60px]"></div>
-        <div className="absolute top-0 left-0 w-full h-full bg-[linear-gradient(45deg,_rgba(236,72,153,0.1)_25%,_transparent_25%),_linear-gradient(-45deg,_rgba(236,72,153,0.1)_25%,_transparent_25%),_linear-gradient(45deg,_transparent_75%,_rgba(236,72,153,0.1)_75%),_linear-gradient(-45deg,_transparent_75%,_rgba(236,72,153,0.1)_75%)] bg-[length:40px_40px]"></div>
+      <div className="absolute inset-0 opacity-30">
+        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_25%_25%,_rgba(219,39,119,0.25)_2px,_transparent_2px),_radial-gradient(circle_at_75%_75%,_rgba(147,51,234,0.25)_2px,_transparent_2px)] bg-[length:60px_60px]"></div>
+        <div className="absolute top-0 left-0 w-full h-full bg-[linear-gradient(45deg,_rgba(236,72,153,0.12)_25%,_transparent_25%),_linear-gradient(-45deg,_rgba(236,72,153,0.12)_25%,_transparent_25%),_linear-gradient(45deg,_transparent_75%,_rgba(236,72,153,0.12)_75%),_linear-gradient(-45deg,_transparent_75%,_rgba(236,72,153,0.12)_75%)] bg-[length:40px_40px]"></div>
       </div>
       
       <Header />
       <main className="container mx-auto px-4 py-12 relative z-10">
         {designerStep === 1 && (
           <div className="max-w-5xl mx-auto space-y-8">
-            <div className="space-y-6 bg-white/85 backdrop-blur-md p-8 rounded-2xl shadow-xl border border-pink-200/60">
+            <div className="space-y-6 bg-white/80 backdrop-blur-lg p-8 rounded-2xl shadow-2xl border border-pink-300/70">
                 <div className="flex justify-between items-start">
                     <div>
                         <h2 className="text-2xl font-semibold text-gray-900">CMF 디자인 하기</h2>
@@ -194,7 +194,7 @@ const App: React.FC = () => {
         {designerStep === 2 && (
             <>
                 <div className="max-w-5xl mx-auto">
-                    <div className="space-y-6 bg-white/85 backdrop-blur-md p-8 rounded-2xl shadow-xl border border-pink-200/60">
+                    <div className="space-y-6 bg-white/80 backdrop-blur-lg p-8 rounded-2xl shadow-2xl border border-pink-300/70">
                          <div className="flex items-center justify-between mb-2">
                             <h2 className="text-2xl font-semibold text-gray-900">2. 사용자 정의 및 생성</h2>
                             <button
