@@ -146,79 +146,94 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white from-10% via-pink-300 via-60% to-purple-400 to-90% text-gray-800 font-sans relative overflow-hidden">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-30">
-        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_25%_25%,_rgba(219,39,119,0.25)_2px,_transparent_2px),_radial-gradient(circle_at_75%_75%,_rgba(147,51,234,0.25)_2px,_transparent_2px)] bg-[length:60px_60px]"></div>
-        <div className="absolute top-0 left-0 w-full h-full bg-[linear-gradient(45deg,_rgba(236,72,153,0.12)_25%,_transparent_25%),_linear-gradient(-45deg,_rgba(236,72,153,0.12)_25%,_transparent_25%),_linear-gradient(45deg,_transparent_75%,_rgba(236,72,153,0.12)_75%),_linear-gradient(-45deg,_transparent_75%,_rgba(236,72,153,0.12)_75%)] bg-[length:40px_40px]"></div>
-      </div>
-      
       <Header />
-      <main className="container mx-auto px-4 py-12 relative z-10">
+      <main className="container mx-auto px-4 py-20 relative z-10">
         {designerStep === 1 && (
-          <div className="max-w-5xl mx-auto space-y-8">
-            <div className="space-y-6 bg-white/80 backdrop-blur-lg p-8 rounded-2xl shadow-2xl border border-pink-300/70">
-                <div className="flex justify-between items-start">
-                    <div>
-                        <h2 className="text-2xl font-semibold text-gray-900">CMF 디자인 하기</h2>
-                        <p className="text-base text-gray-600">최대 3개의 제품 이미지를 업로드할 수 있습니다 (예: 다른 각도).</p>
-                    </div>
-                    <div className="text-right">
-                        <p className="text-sm text-gray-500">무료 체험</p>
-                        <p className="text-lg font-semibold text-pink-700">
-                            {freeUsageCount}/4회 사용
-                        </p>
-                        {freeUsageCount >= 4 && (
-                            <p className="text-xs text-red-500 mt-1">체험 횟수 소진</p>
-                        )}
-                    </div>
-                </div>
-                <div className="pt-4">
-                    <ImageUploader
-                        onImagesUpload={handleImagesUpload}
-                        previewUrls={originalImages.map(img => img.previewUrl)}
-                    />
-                </div>
-                 <div className="pt-6 text-right">
-                    <button
-                        onClick={goToNextStep}
-                        disabled={!isReadyToGenerate}
-                        className="inline-flex items-center justify-center gap-2 text-white bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed focus:ring-4 focus:ring-purple-200 font-bold rounded-xl text-base px-6 py-3 text-center transition-all duration-200 shadow-lg hover:shadow-xl"
-                        >
-                        다음 단계 &rarr;
-                    </button>
-                </div>
+          <div className="max-w-4xl mx-auto text-center space-y-12">
+            {/* Hero Section */}
+            <div className="space-y-6">
+              <h1 className="text-6xl font-bold text-slate-900 leading-tight">
+                CMF Vision
+              </h1>
+              <h2 className="text-3xl font-semibold text-slate-800">
+                으로 스마트하고 빠르게<br />
+                아이디어를 완성하세요
+              </h2>
+              <p className="text-xl text-slate-600 max-w-2xl mx-auto">
+                AI 기술을 활용해 제품의 색상, 소재, 마감을 즉시 시각화하고<br />
+                완벽한 디자인 솔루션을 찾아보세요
+              </p>
+            </div>
+
+            {/* CTA Section */}
+            <div className="pt-8">
+              <button
+                onClick={goToNextStep}
+                className="inline-flex items-center justify-center gap-3 text-white text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 focus:ring-4 focus:ring-purple-200 rounded-2xl px-12 py-4 transition-all duration-200 shadow-2xl hover:shadow-3xl hover:scale-105 transform"
+              >
+                Start
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </button>
+            </div>
+            
+            {/* Usage Counter */}
+            <div className="pt-6">
+              <p className="text-sm text-slate-500">무료 체험</p>
+              <p className="text-lg font-semibold text-pink-700">
+                {freeUsageCount}/4회 사용
+              </p>
+              {freeUsageCount >= 4 && (
+                <p className="text-xs text-red-500 mt-1">체험 횟수 소진</p>
+              )}
             </div>
           </div>
         )}
         
         {designerStep === 2 && (
             <>
-                <div className="max-w-5xl mx-auto">
+                <div className="max-w-5xl mx-auto space-y-8">
+                    {/* Image Upload Section */}
                     <div className="space-y-6 bg-white/80 backdrop-blur-lg p-8 rounded-2xl shadow-2xl border border-pink-300/70">
-                         <div className="flex items-center justify-between mb-2">
-                            <h2 className="text-2xl font-semibold text-gray-900">2. 사용자 정의 및 생성</h2>
+                        <div className="flex items-center justify-between mb-2">
+                            <h2 className="text-2xl font-semibold text-gray-900">1. 이미지 업로드</h2>
                             <button
                                 onClick={goToPrevStep}
-                                className="flex items-center gap-1.5 text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors"
-                                aria-label="이미지 업로드로 돌아가기"
+                                className="flex items-center gap-1.5 text-sm font-medium text-purple-600 hover:text-purple-800 transition-colors"
+                                aria-label="홈으로 돌아가기"
                             >
                                 <ChevronLeftIcon className="w-4 h-4" />
-                                이전
+                                홈
                             </button>
                         </div>
-                        <Controls
-                        material={material}
-                        setMaterial={setMaterial}
-                        color={color}
-                        setColor={setColor}
-                        description={description}
-                        setDescription={setDescription}
-                        onGenerate={handleGenerate}
-                        isLoading={isLoading}
-                        isReady={isReadyToGenerate}
-                        isLimitReached={freeUsageCount >= 4}
-                        />
+                        <div className="space-y-4">
+                            <p className="text-base text-gray-600">최대 3개의 제품 이미지를 업로드할 수 있습니다 (예: 다른 각도).</p>
+                            <ImageUploader
+                                onImagesUpload={handleImagesUpload}
+                                previewUrls={originalImages.map(img => img.previewUrl)}
+                            />
+                        </div>
                     </div>
+
+                    {/* Controls Section */}
+                    {isReadyToGenerate && (
+                        <div className="space-y-6 bg-white/80 backdrop-blur-lg p-8 rounded-2xl shadow-2xl border border-pink-300/70">
+                            <h2 className="text-2xl font-semibold text-gray-900">2. 사용자 정의 및 생성</h2>
+                            <Controls
+                                material={material}
+                                setMaterial={setMaterial}
+                                color={color}
+                                setColor={setColor}
+                                description={description}
+                                setDescription={setDescription}
+                                onGenerate={handleGenerate}
+                                isLoading={isLoading}
+                                isReady={isReadyToGenerate}
+                                isLimitReached={freeUsageCount >= 4}
+                            />
+                        </div>
+                    )}
                 </div>
 
                 {error && (

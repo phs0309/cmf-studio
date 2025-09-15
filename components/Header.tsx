@@ -22,10 +22,10 @@ export const Header: React.FC = () => {
           
           {/* Navigation Menu */}
           <nav className="hidden md:flex items-center space-x-8">
-            <a href="#" className="text-slate-800 hover:text-slate-600 font-medium transition-colors">Create</a>
-            <a href="#" className="text-slate-800 hover:text-slate-600 font-medium transition-colors">Tutorial</a>
-            <a href="#" className="text-slate-800 hover:text-slate-600 font-medium transition-colors">Library</a>
-            <a href="#" className="text-slate-800 hover:text-slate-600 font-medium transition-colors">Price</a>
+            <a href="#" className="text-slate-900 hover:text-slate-700 font-bold transition-colors">Create</a>
+            <a href="#" className="text-slate-900 hover:text-slate-700 font-bold transition-colors">Tutorial</a>
+            <a href="#" className="text-slate-900 hover:text-slate-700 font-bold transition-colors">Library</a>
+            <a href="#" className="text-slate-900 hover:text-slate-700 font-bold transition-colors">Price</a>
           </nav>
           
           {/* Mobile Menu Button */}
