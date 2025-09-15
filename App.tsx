@@ -97,7 +97,7 @@ const App: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [originalImages, material, color, description, userAccessCode, freeUsageCount]);
+  }, [originalImages, material, color, description, freeUsageCount]);
   
   const handleRedo = () => {
     setOriginalImages(Array.from({ length: 3 }, () => ({ file: null, previewUrl: null })));
