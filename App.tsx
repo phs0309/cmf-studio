@@ -6,28 +6,11 @@ import { ResultDisplay } from './components/ResultDisplay';
 import { Loader } from './components/Loader';
 import { generateCmfDesign } from './services/geminiService';
 import { MATERIALS } from './constants';
-import { Menu } from './components/Menu';
 import { ChevronLeftIcon } from './components/icons/ChevronLeftIcon';
-import { CodeEntryModal } from './components/CodeEntryModal';
-import { getRecommendedDesigns, addSubmission } from './services/apiService';
-import type { RecommendedDesign } from './services/apiService';
-import { RecommendationCard } from './components/RecommendationCard';
-import { AdminPage } from './components/AdminPage';
-import { SubmissionModal } from './components/SubmissionModal';
 
 const App: React.FC = () => {
-  const [currentPage, setCurrentPage] = useState<'menu' | 'designer' | 'admin'>('menu');
   const [designerStep, setDesignerStep] = useState<1 | 2>(1);
-  const [showCodeModal, setShowCodeModal] = useState<boolean>(false);
-  const [userAccessCode, setUserAccessCode] = useState<string | null>(null);
   const [freeUsageCount, setFreeUsageCount] = useState<number>(0);
-  
-  // Recommendations state
-  const [recommendations, setRecommendations] = useState<RecommendedDesign[]>([]);
-  const [recommendationsLoading, setRecommendationsLoading] = useState<boolean>(false);
-
-  // Submission Modal state
-  const [showSubmissionModal, setShowSubmissionModal] = useState<boolean>(false);
 
 
   // Designer states
@@ -49,16 +32,6 @@ const App: React.FC = () => {
     }
   }, []);
 
-  // Fetch recommendations based on access code
-  useEffect(() => {
-    if (currentPage === 'designer' && designerStep === 1 && userAccessCode) {
-      setRecommendationsLoading(true);
-      getRecommendedDesigns(userAccessCode)
-        .then(setRecommendations)
-        .catch(err => console.error("Failed to fetch recommendations", err))
-        .finally(() => setRecommendationsLoading(false));
-    }
-  }, [currentPage, designerStep, userAccessCode]);
 
   const handleImagesUpload = (files: File[]) => {
     // Clean up existing URLs
@@ -100,9 +73,9 @@ const App: React.FC = () => {
       return;
     }
 
-    // Check free usage limit for non-premium users
-    if (!userAccessCode && freeUsageCount >= 4) {
-      setError('무료 체험 횟수(4회)를 모두 사용하셨습니다. 더 많은 체험을 원하시면 프리미엄 액세스 코드를 입력해주세요.');
+    // Check free usage limit
+    if (freeUsageCount >= 4) {
+      setError('무료 체험 횟수(4회)를 모두 사용하셨습니다.');
       return;
     }
 
@@ -114,12 +87,10 @@ const App: React.FC = () => {
       const newImageBase64 = await generateCmfDesign(uploadedFiles, material, color, description);
       setGeneratedImage(`data:image/png;base64,${newImageBase64}`);
       
-      // Increment free usage count for non-premium users
-      if (!userAccessCode) {
-        const newCount = freeUsageCount + 1;
-        setFreeUsageCount(newCount);
-        localStorage.setItem('cmf-free-usage-count', newCount.toString());
-      }
+      // Increment free usage count
+      const newCount = freeUsageCount + 1;
+      setFreeUsageCount(newCount);
+      localStorage.setItem('cmf-free-usage-count', newCount.toString());
     } catch (err) {
       console.error(err);
       setError(err instanceof Error ? err.message : 'An unknown error occurred. Please try again.');
@@ -138,164 +109,35 @@ const App: React.FC = () => {
     setDesignerStep(1);
   };
 
-  const handleSendSubmission = async (comment: string) => {
-    const originalImageFiles = originalImages.map(img => img.file).filter((file): file is File => file !== null);
-
-    if (!userAccessCode || !generatedImage || originalImageFiles.length === 0) {
-      throw new Error("Missing required data for submission.");
-    }
-    
-    await addSubmission({
-      accessCode: userAccessCode,
-      comment: comment,
-      originalImageFiles: originalImageFiles,
-      generatedImageUrl: generatedImage,
-    });
-    
-    setShowSubmissionModal(false);
-    alert('성공적으로 라오닉스에게 전송되었습니다!');
-  };
-
-  const handleEditRecommendation = async (imageUrl: string) => {
-    try {
-      // Use proxy mode to avoid CORS issues
-      const response = await fetch(imageUrl, { 
-        mode: 'cors',
-        credentials: 'omit'
-      });
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      const blob = await response.blob();
-      const file = new File([blob], 'recommendation.jpg', { type: blob.type || 'image/jpeg' });
-      
-      // Clear existing images and set the recommendation image as the first image
-      const newImages = Array.from({ length: 3 }, () => ({ file: null, previewUrl: null }));
-      const previewUrl = URL.createObjectURL(file);
-      newImages[0] = { file, previewUrl };
-      
-      setOriginalImages(newImages);
-      setGeneratedImage(null);
-      setError(null);
-      setDesignerStep(2);
-    } catch (err) {
-      console.error('Failed to load recommendation image:', err);
-      // Fallback: try to use the image URL directly as preview
-      try {
-        const newImages = Array.from({ length: 3 }, () => ({ file: null, previewUrl: null }));
-        newImages[0] = { file: null, previewUrl: imageUrl };
-        setOriginalImages(newImages);
-        setGeneratedImage(null);
-        setError(null);
-        setDesignerStep(2);
-      } catch (fallbackErr) {
-        setError('추천 이미지를 불러오는데 실패했습니다. 다른 이미지를 시도해보세요.');
-      }
-    }
-  };
-
 
   const isReadyToGenerate = originalImages.some(img => img.file !== null);
   const originalImageUrls = originalImages.map(img => img.previewUrl).filter((url): url is string => url !== null);
   const showResults = (generatedImage || (designerStep === 2 && isReadyToGenerate)) && !isLoading;
   
-  const navigateToDesigner = () => {
-    setCurrentPage('designer');
-    setDesignerStep(1);
-    setOriginalImages(Array.from({ length: 3 }, () => ({ file: null, previewUrl: null })));
-    setGeneratedImage(null);
-    setError(null);
-  };
-  const navigateToMenu = () => {
-      setCurrentPage('menu');
-  };
-  const navigateToAdmin = () => {
-      setCurrentPage('admin');
-  }
   const goToNextStep = () => setDesignerStep(2);
   const goToPrevStep = () => setDesignerStep(1);
 
-  const handleStartDesigner = (type: 'premium' | 'free') => {
-      if (type === 'premium') {
-          setShowCodeModal(true);
-      } else {
-          setUserAccessCode(null);
-          setRecommendations([]);
-          navigateToDesigner();
-      }
-  };
-  
-  const handleCodeSuccess = (code: string) => {
-      setShowCodeModal(false);
-      setUserAccessCode(code);
-      navigateToDesigner();
-  }
-
-
-  if (currentPage === 'menu') {
-    return (
-        <>
-            <Menu onStartDesigner={handleStartDesigner} onNavigateToAdmin={navigateToAdmin} />
-            {showCodeModal && <CodeEntryModal onClose={() => setShowCodeModal(false)} onSuccess={handleCodeSuccess} />}
-        </>
-    );
-  }
-
-  if (currentPage === 'admin') {
-      return <AdminPage onNavigateBack={navigateToMenu} />;
-  }
-
   return (
     <div className="min-h-screen bg-gray-50 text-gray-800 font-sans">
-      <Header onNavigateBack={navigateToMenu} />
+      <Header />
       <main className="container mx-auto px-4 py-12">
         {designerStep === 1 && (
           <div className="max-w-5xl mx-auto space-y-8">
-            {userAccessCode && (
-              <div className="bg-white p-8 rounded-xl border border-gray-200/80 shadow-sm">
-                  <h2 className="text-2xl font-semibold text-gray-900">라오닉스의 추천</h2>
-                  <p className="mt-2 text-base text-gray-600">라오닉스가 추천하는 CMF 디자인으로 영감을 받아보세요.</p>
-                  {recommendationsLoading ? (
-                      <div className="grid grid-cols-1 gap-8 pt-4">
-                          {/* Skeleton Loaders */}
-                          {[...Array(3)].map((_, i) => (
-                              <div key={i} className="bg-white rounded-lg border border-gray-200/80">
-                                  <div className="aspect-[4/3] md:aspect-[3/2] lg:aspect-[5/3] bg-gray-200 rounded-t-lg animate-pulse"></div>
-                                  <div className="p-6 space-y-2">
-                                      <div className="h-5 bg-gray-200 rounded w-3/4 animate-pulse"></div>
-                                      <div className="h-4 bg-gray-200 rounded w-full animate-pulse"></div>
-                                      <div className="h-4 bg-gray-200 rounded w-2/3 animate-pulse"></div>
-                                  </div>
-                              </div>
-                          ))}
-                      </div>
-                  ) : (
-                      <div className="grid grid-cols-1 gap-8 pt-4">
-                          {recommendations.map(rec => <RecommendationCard key={rec.id} {...rec} onEdit={handleEditRecommendation} />)}
-                      </div>
-                  )}
-              </div>
-            )}
-            
             <div className="space-y-6 bg-white p-8 rounded-xl border border-gray-200/80 shadow-sm">
                 <div className="flex justify-between items-start">
                     <div>
-                        <h2 className="text-2xl font-semibold text-gray-900">직접 CMF 디자인 하기</h2>
+                        <h2 className="text-2xl font-semibold text-gray-900">CMF 디자인 하기</h2>
                         <p className="text-base text-gray-600">최대 3개의 제품 이미지를 업로드할 수 있습니다 (예: 다른 각도).</p>
                     </div>
-                    {!userAccessCode && (
-                        <div className="text-right">
-                            <p className="text-sm text-gray-500">무료 체험</p>
-                            <p className="text-lg font-semibold text-blue-600">
-                                {freeUsageCount}/4회 사용
-                            </p>
-                            {freeUsageCount >= 4 && (
-                                <p className="text-xs text-red-500 mt-1">체험 횟수 소진</p>
-                            )}
-                        </div>
-                    )}
+                    <div className="text-right">
+                        <p className="text-sm text-gray-500">무료 체험</p>
+                        <p className="text-lg font-semibold text-blue-600">
+                            {freeUsageCount}/4회 사용
+                        </p>
+                        {freeUsageCount >= 4 && (
+                            <p className="text-xs text-red-500 mt-1">체험 횟수 소진</p>
+                        )}
+                    </div>
                 </div>
                 <div className="pt-4">
                     <ImageUploader
@@ -341,7 +183,7 @@ const App: React.FC = () => {
                         onGenerate={handleGenerate}
                         isLoading={isLoading}
                         isReady={isReadyToGenerate}
-                        isLimitReached={!userAccessCode && freeUsageCount >= 4}
+                        isLimitReached={freeUsageCount >= 4}
                         />
                     </div>
                 </div>
@@ -371,14 +213,6 @@ const App: React.FC = () => {
                             >
                                 다시 하기
                             </button>
-                            {userAccessCode && (
-                                <button
-                                    onClick={() => setShowSubmissionModal(true)}
-                                    className="text-blue-900 bg-blue-200 hover:bg-blue-300 focus:ring-4 focus:ring-blue-200 font-bold rounded-lg text-base px-6 py-3 text-center transition-colors duration-200"
-                                >
-                                    라오닉스에게 보내기
-                                </button>
-                            )}
                         </div>
                     )}
                 </>
@@ -390,12 +224,6 @@ const App: React.FC = () => {
       <footer className="text-center py-6 text-gray-500 text-sm">
         <p>Gemini API 제공</p>
       </footer>
-      {showSubmissionModal && (
-        <SubmissionModal 
-            onClose={() => setShowSubmissionModal(false)}
-            onSubmit={handleSendSubmission}
-        />
-      )}
     </div>
   );
 };
