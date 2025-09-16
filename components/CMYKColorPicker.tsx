@@ -98,31 +98,52 @@ export const CMYKColorPicker: React.FC<CMYKColorPickerProps> = ({
   };
 
   return (
-    <div className="space-y-4">
-      {/* Color preview */}
-      <div className="flex items-center gap-3">
-        <div
-          className="w-12 h-12 rounded border border-gray-300"
-          style={{ backgroundColor: value }}
-        />
-        <div className="text-sm font-mono text-gray-600">{value}</div>
+    <div className="space-y-3">
+      {/* Main Color Spectrum and Preview */}
+      <div className="flex gap-4 items-center">
+        {/* Large Color Spectrum Wheel */}
+        <div className="relative">
+          <input
+            type="color"
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            disabled={disabled}
+            className={`w-16 h-16 rounded-full border-3 border-white shadow-lg cursor-pointer transition-all duration-200 hover:scale-105 disabled:cursor-not-allowed disabled:opacity-50 ${
+              disabled ? 'filter grayscale' : ''
+            }`}
+            style={{
+              WebkitAppearance: 'none',
+              MozAppearance: 'none',
+              appearance: 'none',
+              background: 'none',
+              border: '3px solid white',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.15), inset 0 0 0 1px rgba(0,0,0,0.1)'
+            }}
+          />
+          <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-purple-500 rounded-full border-2 border-white shadow-sm"></div>
+        </div>
+
+        {/* Color Info */}
+        <div className="flex-1">
+          <div className="text-sm font-mono text-gray-600 mb-1">{value}</div>
+          <div className="text-xs text-gray-500">
+            C:{cmyk.c} M:{cmyk.m} Y:{cmyk.y} K:{cmyk.k}
+          </div>
+        </div>
       </div>
 
-      {/* Color Palette Presets */}
+      {/* Compact Color Palette Presets */}
       <div>
-        <label className="block text-sm font-medium text-gray-800 mb-2">
-          색상 팔레트
-        </label>
-        <div className="grid grid-cols-6 gap-2">
+        <div className="grid grid-cols-12 gap-1">
           {COLOR_PRESETS.map((preset) => (
             <button
               key={preset.name}
               type="button"
               onClick={() => !disabled && handlePresetSelect(preset)}
               disabled={disabled}
-              className={`w-8 h-8 rounded-lg border-2 transition-all duration-200 hover:scale-110 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50 ${
+              className={`w-6 h-6 rounded border transition-all duration-200 hover:scale-110 disabled:cursor-not-allowed disabled:opacity-50 ${
                 value.toUpperCase() === preset.hex.toUpperCase()
-                  ? 'border-purple-500 ring-2 ring-purple-200 shadow-lg'
+                  ? 'border-purple-500 ring-1 ring-purple-300'
                   : 'border-gray-200 hover:border-purple-300'
               }`}
               style={{ backgroundColor: preset.hex }}
@@ -132,105 +153,92 @@ export const CMYKColorPicker: React.FC<CMYKColorPickerProps> = ({
         </div>
       </div>
 
-      {/* CMYK sliders */}
-      <div className="grid grid-cols-1 gap-3">
-        {/* Cyan */}
-        <div className="bg-gray-50 p-3 rounded-lg">
-          <label className="flex items-center justify-between text-sm font-medium text-gray-800 mb-2">
-            <span className="flex items-center gap-2">
-              <span className="w-4 h-4 bg-cyan-500 rounded-full shadow-sm"></span>
-              Cyan (C)
-            </span>
-            <span className="text-purple-600 font-semibold">{cmyk.c}%</span>
-          </label>
-          <input
-            type="range"
-            min="0"
-            max="100"
-            value={cmyk.c}
-            onChange={(e) => handleCmykChange('c', parseInt(e.target.value))}
-            disabled={disabled}
-            className="w-full h-3 bg-gradient-to-r from-gray-100 to-cyan-500 rounded-lg appearance-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 slider-thumb"
-          />
-        </div>
-
-        {/* Magenta */}
-        <div className="bg-gray-50 p-3 rounded-lg">
-          <label className="flex items-center justify-between text-sm font-medium text-gray-800 mb-2">
-            <span className="flex items-center gap-2">
-              <span className="w-4 h-4 rounded-full shadow-sm" style={{backgroundColor: '#e91e63'}}></span>
-              Magenta (M)
-            </span>
-            <span className="text-purple-600 font-semibold">{cmyk.m}%</span>
-          </label>
-          <input
-            type="range"
-            min="0"
-            max="100"
-            value={cmyk.m}
-            onChange={(e) => handleCmykChange('m', parseInt(e.target.value))}
-            disabled={disabled}
-            className="w-full h-3 rounded-lg appearance-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 slider-thumb"
-            style={{
-              background: `linear-gradient(to right, #f3f4f6, #e91e63)`
-            }}
-          />
-        </div>
-
-        {/* Yellow */}
-        <div className="bg-gray-50 p-3 rounded-lg">
-          <label className="flex items-center justify-between text-sm font-medium text-gray-800 mb-2">
-            <span className="flex items-center gap-2">
-              <span className="w-4 h-4 bg-yellow-500 rounded-full shadow-sm"></span>
-              Yellow (Y)
-            </span>
-            <span className="text-purple-600 font-semibold">{cmyk.y}%</span>
-          </label>
-          <input
-            type="range"
-            min="0"
-            max="100"
-            value={cmyk.y}
-            onChange={(e) => handleCmykChange('y', parseInt(e.target.value))}
-            disabled={disabled}
-            className="w-full h-3 bg-gradient-to-r from-gray-100 to-yellow-500 rounded-lg appearance-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 slider-thumb"
-          />
-        </div>
-
-        {/* Key (Black) */}
-        <div className="bg-gray-50 p-3 rounded-lg">
-          <label className="flex items-center justify-between text-sm font-medium text-gray-800 mb-2">
-            <span className="flex items-center gap-2">
-              <span className="w-4 h-4 bg-black rounded-full shadow-sm"></span>
-              Black (K)
-            </span>
-            <span className="text-purple-600 font-semibold">{cmyk.k}%</span>
-          </label>
-          <input
-            type="range"
-            min="0"
-            max="100"
-            value={cmyk.k}
-            onChange={(e) => handleCmykChange('k', parseInt(e.target.value))}
-            disabled={disabled}
-            className="w-full h-3 bg-gradient-to-r from-gray-100 to-black rounded-lg appearance-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 slider-thumb"
-          />
-        </div>
-      </div>
-
-      {/* Hex input */}
+      {/* Compact CMYK sliders */}
       <div className="bg-gray-50 p-3 rounded-lg">
-        <label className="block text-sm font-medium text-gray-800 mb-2">
-          Hex Color
-        </label>
-        <input
-          type="text"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          disabled={disabled}
-          className="w-full px-3 py-2 border border-gray-200 bg-white rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 font-mono text-sm transition-colors disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
-          placeholder="#000000"
-        />
+        <div className="grid grid-cols-2 gap-3">
+          {/* Cyan */}
+          <div>
+            <label className="flex items-center justify-between text-xs font-medium text-gray-700 mb-1">
+              <span className="flex items-center gap-1">
+                <span className="w-3 h-3 bg-cyan-500 rounded-full"></span>
+                C
+              </span>
+              <span className="text-purple-600 font-semibold">{cmyk.c}%</span>
+            </label>
+            <input
+              type="range"
+              min="0"
+              max="100"
+              value={cmyk.c}
+              onChange={(e) => handleCmykChange('c', parseInt(e.target.value))}
+              disabled={disabled}
+              className="w-full h-2 bg-gradient-to-r from-gray-200 to-cyan-500 rounded appearance-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+            />
+          </div>
+
+          {/* Magenta */}
+          <div>
+            <label className="flex items-center justify-between text-xs font-medium text-gray-700 mb-1">
+              <span className="flex items-center gap-1">
+                <span className="w-3 h-3 rounded-full" style={{backgroundColor: '#e91e63'}}></span>
+                M
+              </span>
+              <span className="text-purple-600 font-semibold">{cmyk.m}%</span>
+            </label>
+            <input
+              type="range"
+              min="0"
+              max="100"
+              value={cmyk.m}
+              onChange={(e) => handleCmykChange('m', parseInt(e.target.value))}
+              disabled={disabled}
+              className="w-full h-2 rounded appearance-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+              style={{
+                background: `linear-gradient(to right, #e5e7eb, #e91e63)`
+              }}
+            />
+          </div>
+
+          {/* Yellow */}
+          <div>
+            <label className="flex items-center justify-between text-xs font-medium text-gray-700 mb-1">
+              <span className="flex items-center gap-1">
+                <span className="w-3 h-3 bg-yellow-500 rounded-full"></span>
+                Y
+              </span>
+              <span className="text-purple-600 font-semibold">{cmyk.y}%</span>
+            </label>
+            <input
+              type="range"
+              min="0"
+              max="100"
+              value={cmyk.y}
+              onChange={(e) => handleCmykChange('y', parseInt(e.target.value))}
+              disabled={disabled}
+              className="w-full h-2 bg-gradient-to-r from-gray-200 to-yellow-500 rounded appearance-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+            />
+          </div>
+
+          {/* Key (Black) */}
+          <div>
+            <label className="flex items-center justify-between text-xs font-medium text-gray-700 mb-1">
+              <span className="flex items-center gap-1">
+                <span className="w-3 h-3 bg-black rounded-full"></span>
+                K
+              </span>
+              <span className="text-purple-600 font-semibold">{cmyk.k}%</span>
+            </label>
+            <input
+              type="range"
+              min="0"
+              max="100"
+              value={cmyk.k}
+              onChange={(e) => handleCmykChange('k', parseInt(e.target.value))}
+              disabled={disabled}
+              className="w-full h-2 bg-gradient-to-r from-gray-200 to-black rounded appearance-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+            />
+          </div>
+        </div>
       </div>
     </div>
   );

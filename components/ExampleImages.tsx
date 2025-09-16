@@ -6,25 +6,25 @@ const EXAMPLE_IMAGES = [
   {
     id: 'concept-car-1',
     title: 'Concept Car 1',
-    thumbnail: '/examples/car1.jpg', // 실제 이미지 경로
+    thumbnail: '/examples/car1.png', // 실제 이미지 경로
     description: 'Futuristic concept vehicle design',
   },
   {
     id: 'concept-car-2', 
     title: 'Concept Car 2',
-    thumbnail: '/examples/car2.jpg', // 실제 이미지 경로
+    thumbnail: '/examples/car2.png', // 실제 이미지 경로
     description: 'Modern automotive concept',
   },
   {
     id: 'robot-charger-1',
     title: 'Robot Charger 1',
-    thumbnail: '/examples/robot1.jpg', // 실제 이미지 경로
+    thumbnail: '/examples/robot1.png', // 실제 이미지 경로
     description: 'Robotic charging station design',
   },
   {
     id: 'robot-charger-2',
     title: 'Robot Charger 2', 
-    thumbnail: '/examples/robot2.jpg', // 실제 이미지 경로
+    thumbnail: '/examples/robot2.png', // 실제 이미지 경로
     description: 'Alternative robot charger view',
   },
 ];
