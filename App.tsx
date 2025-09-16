@@ -218,6 +218,15 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white from-10% via-pink-300 via-60% to-purple-400 to-90% text-gray-800 font-sans relative overflow-hidden">
+      {/* Dot pattern background */}
+      <div 
+        className="absolute inset-0 opacity-20"
+        style={{
+          backgroundImage: `radial-gradient(circle, rgba(255,255,255,0.8) 1px, transparent 1px)`,
+          backgroundSize: '20px 20px',
+          backgroundPosition: '0 0, 10px 10px'
+        }}
+      ></div>
       <Header />
       <main className="container mx-auto px-4 py-20 relative z-10">
         {designerStep === 1 && (
