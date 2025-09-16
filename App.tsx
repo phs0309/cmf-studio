@@ -91,6 +91,22 @@ const App: React.FC = () => {
     setGeneratedImages([]);
     setError(null);
   };
+
+  const handleExampleImageSelect = async (imagePath: string) => {
+    try {
+      // 예시 이미지를 fetch하여 File 객체로 변환
+      const response = await fetch(imagePath);
+      const blob = await response.blob();
+      const fileName = imagePath.split('/').pop() || 'example.jpg';
+      const file = new File([blob], fileName, { type: blob.type });
+      
+      // 기존 이미지들과 함께 처리
+      handleImagesUpload([file]);
+    } catch (error) {
+      console.error('Error loading example image:', error);
+      setError('예시 이미지를 불러오는데 실패했습니다.');
+    }
+  };
   
   useEffect(() => {
     return () => {
@@ -292,6 +308,7 @@ const App: React.FC = () => {
                             <p className="text-base text-gray-600">최대 3개의 제품 이미지를 업로드할 수 있습니다 (예: 다른 각도).</p>
                             <ImageUploader
                                 onImagesUpload={handleImagesUpload}
+                                onExampleImageSelect={handleExampleImageSelect}
                                 previewUrls={originalImages.map(img => img.previewUrl)}
                             />
                         </div>

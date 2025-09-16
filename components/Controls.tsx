@@ -1,6 +1,7 @@
 import React from 'react';
 import { MATERIALS, FINISHES } from '../constants';
 import { SparklesIcon } from './icons/SparklesIcon';
+import { CMYKColorPicker } from './CMYKColorPicker';
 
 interface ControlsProps {
   material: string;
@@ -106,25 +107,11 @@ export const Controls: React.FC<ControlsProps> = ({
             />
           </button>
         </div>
-        <div className="flex items-center gap-3">
-          <input
-            id="color"
-            type="color"
+        <div className="mt-2">
+          <CMYKColorPicker
             value={color}
-            onChange={(e) => setColor(e.target.value)}
+            onChange={setColor}
             disabled={!colorEnabled}
-            className={`p-1 h-12 w-12 block bg-white border border-gray-300 rounded-lg ${
-              colorEnabled ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'
-            }`}
-          />
-          <input
-             type="text"
-             value={color}
-             onChange={(e) => setColor(e.target.value)}
-             disabled={!colorEnabled}
-             className={`w-full border-gray-300 text-gray-900 rounded-lg focus:ring-purple-500 focus:border-purple-500 block p-3 font-mono text-base ${
-               colorEnabled ? 'bg-gray-100' : 'bg-gray-50 text-gray-400 cursor-not-allowed'
-             }`}
           />
         </div>
       </div>

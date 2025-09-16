@@ -1,12 +1,14 @@
 import React, { useCallback, useState } from 'react';
 import { UploadIcon } from './icons/UploadIcon';
+import { ExampleImages } from './ExampleImages';
 
 interface ImageUploaderProps {
   onImagesUpload: (files: File[]) => void;
+  onExampleImageSelect: (imagePath: string) => void;
   previewUrls: (string | null)[];
 }
 
-export const ImageUploader: React.FC<ImageUploaderProps> = ({ onImagesUpload, previewUrls }) => {
+export const ImageUploader: React.FC<ImageUploaderProps> = ({ onImagesUpload, onExampleImageSelect, previewUrls }) => {
   const [isDragging, setIsDragging] = useState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -46,7 +48,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({ onImagesUpload, pr
   const hasImages = previewUrls.some(url => url !== null);
 
   return (
-    <div className="w-full">
+    <div className="w-full space-y-6">
       <label
         htmlFor="dropzone-file"
         onDrop={handleDrop}
@@ -79,6 +81,9 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({ onImagesUpload, pr
         )}
         <input id="dropzone-file" type="file" className="hidden" onChange={handleFileChange} accept="image/png, image/jpeg, image/webp" multiple />
       </label>
+      
+      {/* Example Images Section */}
+      <ExampleImages onImageSelect={onExampleImageSelect} />
     </div>
   );
 };
