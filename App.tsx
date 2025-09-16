@@ -22,7 +22,7 @@ const App: React.FC = () => {
   const [color, setColor] = useState<string>('#007aff'); // Apple-like blue
   const [finish, setFinish] = useState<string>(FINISHES[0]);
   const [description, setDescription] = useState<string>('');
-  const [generatedImage, setGeneratedImage] = useState<string | null>(null);
+  const [generatedImages, setGeneratedImages] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   
@@ -88,7 +88,7 @@ const App: React.FC = () => {
     });
     
     setOriginalImages(newImages);
-    setGeneratedImage(null);
+    setGeneratedImages([]);
     setError(null);
   };
   
@@ -119,11 +119,11 @@ const App: React.FC = () => {
 
     setIsLoading(true);
     setError(null);
-    setGeneratedImage(null);
+    setGeneratedImages([]);
 
     try {
-      const newImageBase64 = await generateCmfDesign(uploadedFiles, material, color, description);
-      setGeneratedImage(`data:image/png;base64,${newImageBase64}`);
+      const newImagesBase64 = await generateCmfDesign(uploadedFiles, material, color, description);
+      setGeneratedImages(newImagesBase64);
       
       // Increment free usage count and update timestamp
       const newCount = freeUsageCount + 1;
@@ -141,7 +141,7 @@ const App: React.FC = () => {
   
   const handleRedo = () => {
     setOriginalImages(Array.from({ length: 3 }, () => ({ file: null, previewUrl: null })));
-    setGeneratedImage(null);
+    setGeneratedImages([]);
     setError(null);
     setMaterial(MATERIALS[0]);
     setColor('#007aff');
@@ -211,7 +211,7 @@ const App: React.FC = () => {
 
   const isReadyToGenerate = originalImages.some(img => img.file !== null);
   const originalImageUrls = originalImages.map(img => img.previewUrl).filter((url): url is string => url !== null);
-  const showResults = (generatedImage || (designerStep === 2 && isReadyToGenerate)) && !isLoading;
+  const showResults = (generatedImages.length > 0 || (designerStep === 2 && isReadyToGenerate)) && !isLoading;
   
   const goToNextStep = () => setDesignerStep(2);
   const goToPrevStep = () => setDesignerStep(1);
@@ -403,8 +403,8 @@ const App: React.FC = () => {
                 
                 {showResults && (
                 <>
-                    <ResultDisplay originalImageUrls={originalImageUrls} generatedImageUrl={generatedImage} />
-                    {generatedImage && (
+                    <ResultDisplay originalImageUrls={originalImageUrls} generatedImageUrls={generatedImages} />
+                    {generatedImages.length > 0 && (
                         <div className="max-w-5xl mx-auto mt-8 flex justify-center gap-4">
                             <button
                                 onClick={handleRedo}

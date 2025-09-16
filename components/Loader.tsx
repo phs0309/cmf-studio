@@ -3,7 +3,7 @@ import React from 'react';
 export const Loader: React.FC = () => {
   return (
     <svg
-      className="w-12 h-12 text-blue-600"
+      className="w-12 h-12 text-blue-600 animate-spin"
       viewBox="0 0 24 24"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -64,19 +64,6 @@ export const Loader: React.FC = () => {
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      <style>{`
-        @keyframes rotate {
-          from {
-            transform: rotate(0deg);
-          }
-          to {
-            transform: rotate(360deg);
-          }
-        }
-        svg {
-          animation: rotate 2s linear infinite;
-        }
-      `}</style>
     </svg>
   );
 };

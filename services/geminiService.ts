@@ -136,52 +136,65 @@ function getDefaultRecommendation(input: AIRecommendationInput): AIRecommendatio
   return recommendations[selectedIndex];
 }
 
-export const generateCmfDesign = async (imageFiles: File[], material: string, color: string, description?: string): Promise<string> => {
+export const generateCmfDesign = async (imageFiles: File[], material: string, color: string, description?: string): Promise<string[]> => {
   if (!process.env.API_KEY) {
     throw new Error("API_KEY environment variable not set");
   }
 
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
-  const base64ImagePromises = imageFiles.map(fileToBase64);
-  const base64ImagesData = await Promise.all(base64ImagePromises);
+  // Process each image individually to maintain consistency
+  const results: string[] = [];
+  
+  for (let i = 0; i < imageFiles.length; i++) {
+    const file = imageFiles[i];
+    const base64Data = await fileToBase64(file);
+    
+    const imagePart = {
+      inlineData: {
+        data: base64Data,
+        mimeType: file.type,
+      },
+    };
 
-  const imageParts = imageFiles.map((file, index) => ({
-    inlineData: {
-      data: base64ImagesData[index],
-      mimeType: file.type,
-    },
-  }));
-
-  const basePrompt = `Please redesign the product(s) shown in the image(s). If multiple images are provided, treat them as different views of the same product or a cohesive product line.
+    const basePrompt = `Please redesign the product shown in this image.
 Apply a '${material}' material and finish.
 Change its primary color to the hex code '${color}'.
-Maintain the original product shape, proportions, and background as much as possible.`;
+Maintain the original product shape, proportions, and background as much as possible.
+This is image ${i + 1} of ${imageFiles.length} images being processed with identical styling.`;
 
-  const additionalDescription = description && description.trim() ? `\nAdditional requirements: ${description}` : '';
-  
-  const prompt = `${basePrompt}${additionalDescription}\nThe final output must be only the redesigned product image, with no additional text or commentary.`;
+    const additionalDescription = description && description.trim() ? `\nAdditional requirements: ${description}` : '';
+    
+    const prompt = `${basePrompt}${additionalDescription}\nThe final output must be only the redesigned product image, with no additional text or commentary.`;
 
-  const response = await ai.models.generateContent({
-    model: 'gemini-2.5-flash-image-preview',
-    contents: {
-      parts: [
-        ...imageParts,
-        {
-          text: prompt,
-        },
-      ],
-    },
-    config: {
-        responseModalities: [Modality.IMAGE, Modality.TEXT],
-    },
-  });
-  
-  for (const part of response.candidates?.[0]?.content?.parts || []) {
-    if (part.inlineData) {
-      return part.inlineData.data;
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash-image-preview',
+      contents: {
+        parts: [
+          imagePart,
+          {
+            text: prompt,
+          },
+        ],
+      },
+      config: {
+          responseModalities: [Modality.IMAGE, Modality.TEXT],
+      },
+    });
+    
+    let imageFound = false;
+    for (const part of response.candidates?.[0]?.content?.parts || []) {
+      if (part.inlineData) {
+        results.push(part.inlineData.data);
+        imageFound = true;
+        break;
+      }
+    }
+    
+    if (!imageFound) {
+      throw new Error(`The AI did not return a valid image for image ${i + 1}. Please try again.`);
     }
   }
 
-  throw new Error("The AI did not return a valid image. Please try again with a different image or prompt.");
+  return results;
 };
