@@ -11,7 +11,12 @@
       "Bash(npm run build:*)",
       "Bash(npm install)",
       "Bash(node:*)",
-      "WebFetch(domain:cmf-studio.onrender.com)"
+      "WebFetch(domain:cmf-studio.onrender.com)",
+      "Bash(git pull:*)",
+      "Bash(git stash:*)",
+      "Bash(npm run dev:*)",
+      "Bash(mkdir:*)",
+      "WebFetch(domain:designs.ai)"
     ],
     "deny": [],
     "ask": []

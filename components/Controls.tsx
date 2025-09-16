@@ -13,6 +13,14 @@ interface ControlsProps {
   isLoading: boolean;
   isReady: boolean;
   isLimitReached?: boolean;
+  materialEnabled: boolean;
+  setMaterialEnabled: (enabled: boolean) => void;
+  colorEnabled: boolean;
+  setColorEnabled: (enabled: boolean) => void;
+  finishEnabled: boolean;
+  setFinishEnabled: (enabled: boolean) => void;
+  descriptionEnabled: boolean;
+  setDescriptionEnabled: (enabled: boolean) => void;
 }
 
 export const Controls: React.FC<ControlsProps> = ({
@@ -26,18 +34,45 @@ export const Controls: React.FC<ControlsProps> = ({
   isLoading,
   isReady,
   isLimitReached = false,
+  materialEnabled,
+  setMaterialEnabled,
+  colorEnabled,
+  setColorEnabled,
+  finishEnabled,
+  setFinishEnabled,
+  descriptionEnabled,
+  setDescriptionEnabled,
 }) => {
   return (
     <div className="space-y-6">
+      {/* 소재 섹션 */}
       <div>
-        <label htmlFor="material" className="block text-base font-medium text-gray-800 mb-2">
-          소재 및 마감
-        </label>
+        <div className="flex items-center justify-between mb-3">
+          <label htmlFor="material" className="text-base font-medium text-gray-800">
+            소재
+          </label>
+          <button
+            type="button"
+            onClick={() => setMaterialEnabled(!materialEnabled)}
+            className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 ${
+              materialEnabled ? 'bg-purple-600' : 'bg-gray-200'
+            }`}
+          >
+            <span
+              className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                materialEnabled ? 'translate-x-5' : 'translate-x-0'
+              }`}
+            />
+          </button>
+        </div>
         <select
           id="material"
           value={material}
           onChange={(e) => setMaterial(e.target.value)}
-          className="w-full bg-gray-100 border-gray-300 text-gray-900 rounded-lg focus:ring-purple-500 focus:border-purple-500 block p-3 text-base"
+          disabled={!materialEnabled}
+          className={`w-full border-gray-300 text-gray-900 rounded-lg focus:ring-purple-500 focus:border-purple-500 block p-3 text-base ${
+            materialEnabled ? 'bg-gray-100' : 'bg-gray-50 text-gray-400 cursor-not-allowed'
+          }`}
         >
           {MATERIALS.map((mat) => (
             <option key={mat} value={mat}>
@@ -47,37 +82,105 @@ export const Controls: React.FC<ControlsProps> = ({
         </select>
       </div>
 
+      {/* 색상 섹션 */}
       <div>
-        <label htmlFor="color" className="block text-base font-medium text-gray-800 mb-2">
-          기본 색상
-        </label>
+        <div className="flex items-center justify-between mb-3">
+          <label htmlFor="color" className="text-base font-medium text-gray-800">
+            색상
+          </label>
+          <button
+            type="button"
+            onClick={() => setColorEnabled(!colorEnabled)}
+            className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 ${
+              colorEnabled ? 'bg-purple-600' : 'bg-gray-200'
+            }`}
+          >
+            <span
+              className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                colorEnabled ? 'translate-x-5' : 'translate-x-0'
+              }`}
+            />
+          </button>
+        </div>
         <div className="flex items-center gap-3">
           <input
             id="color"
             type="color"
             value={color}
             onChange={(e) => setColor(e.target.value)}
-            className="p-1 h-12 w-12 block bg-white border border-gray-300 cursor-pointer rounded-lg"
+            disabled={!colorEnabled}
+            className={`p-1 h-12 w-12 block bg-white border border-gray-300 rounded-lg ${
+              colorEnabled ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'
+            }`}
           />
           <input
              type="text"
              value={color}
              onChange={(e) => setColor(e.target.value)}
-             className="w-full bg-gray-100 border-gray-300 text-gray-900 rounded-lg focus:ring-purple-500 focus:border-purple-500 block p-3 font-mono text-base"
+             disabled={!colorEnabled}
+             className={`w-full border-gray-300 text-gray-900 rounded-lg focus:ring-purple-500 focus:border-purple-500 block p-3 font-mono text-base ${
+               colorEnabled ? 'bg-gray-100' : 'bg-gray-50 text-gray-400 cursor-not-allowed'
+             }`}
           />
         </div>
       </div>
 
+      {/* 마감 섹션 */}
       <div>
-        <label htmlFor="description" className="block text-base font-medium text-gray-800 mb-2">
-          추가 설명 (선택사항)
-        </label>
+        <div className="flex items-center justify-between mb-3">
+          <label className="text-base font-medium text-gray-800">
+            마감
+          </label>
+          <button
+            type="button"
+            onClick={() => setFinishEnabled(!finishEnabled)}
+            className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 ${
+              finishEnabled ? 'bg-purple-600' : 'bg-gray-200'
+            }`}
+          >
+            <span
+              className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                finishEnabled ? 'translate-x-5' : 'translate-x-0'
+              }`}
+            />
+          </button>
+        </div>
+        <div className={`p-3 rounded-lg border border-gray-300 text-base ${
+          finishEnabled ? 'bg-gray-100 text-gray-900' : 'bg-gray-50 text-gray-400'
+        }`}>
+          {finishEnabled ? '마감 옵션이 활성화되었습니다' : '마감 옵션이 비활성화되었습니다'}
+        </div>
+      </div>
+
+      {/* 추가 설명 섹션 */}
+      <div>
+        <div className="flex items-center justify-between mb-3">
+          <label htmlFor="description" className="text-base font-medium text-gray-800">
+            추가 설명
+          </label>
+          <button
+            type="button"
+            onClick={() => setDescriptionEnabled(!descriptionEnabled)}
+            className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 ${
+              descriptionEnabled ? 'bg-purple-600' : 'bg-gray-200'
+            }`}
+          >
+            <span
+              className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                descriptionEnabled ? 'translate-x-5' : 'translate-x-0'
+              }`}
+            />
+          </button>
+        </div>
         <textarea
           id="description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          placeholder="예: 가운데 A 로고를 그려줘"
-          className="w-full bg-gray-100 border-gray-300 text-gray-900 rounded-lg focus:ring-purple-500 focus:border-purple-500 block p-3 text-base resize-none"
+          placeholder={descriptionEnabled ? "예: 가운데 A 로고를 그려줘" : "추가 설명이 비활성화되었습니다"}
+          disabled={!descriptionEnabled}
+          className={`w-full border-gray-300 text-gray-900 rounded-lg focus:ring-purple-500 focus:border-purple-500 block p-3 text-base resize-none ${
+            descriptionEnabled ? 'bg-gray-100' : 'bg-gray-50 text-gray-400 cursor-not-allowed'
+          }`}
           rows={3}
         />
       </div>

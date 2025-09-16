@@ -4,6 +4,7 @@ import { ImageUploader } from './components/ImageUploader';
 import { Controls } from './components/Controls';
 import { ResultDisplay } from './components/ResultDisplay';
 import { Loader } from './components/Loader';
+import { AIRecommendationModal, AIRecommendation } from './components/AIRecommendationModal';
 import { generateCmfDesign } from './services/geminiService';
 import { MATERIALS } from './constants';
 import { ChevronLeftIcon } from './components/icons/ChevronLeftIcon';
@@ -23,6 +24,17 @@ const App: React.FC = () => {
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  
+  // Toggle states for each customization category
+  const [materialEnabled, setMaterialEnabled] = useState<boolean>(true);
+  const [colorEnabled, setColorEnabled] = useState<boolean>(true);
+  const [finishEnabled, setFinishEnabled] = useState<boolean>(false);
+  const [descriptionEnabled, setDescriptionEnabled] = useState<boolean>(false);
+  
+  // AI Recommendation modal state
+  const [isAIModalOpen, setIsAIModalOpen] = useState<boolean>(false);
+  const [aiRecommendation, setAiRecommendation] = useState<AIRecommendation | null>(null);
+  const [showRecommendationBanner, setShowRecommendationBanner] = useState<boolean>(false);
 
   // Initialize free usage count from localStorage with 10-minute reset
   useEffect(() => {
@@ -133,7 +145,63 @@ const App: React.FC = () => {
     setMaterial(MATERIALS[0]);
     setColor('#007aff');
     setDescription('');
+    setMaterialEnabled(true);
+    setColorEnabled(true);
+    setFinishEnabled(false);
+    setDescriptionEnabled(false);
+    setAiRecommendation(null);
+    setShowRecommendationBanner(false);
     setDesignerStep(1);
+  };
+
+  // AI 추천 처리
+  const handleAIRecommendation = (recommendation: AIRecommendation) => {
+    setAiRecommendation(recommendation);
+    setShowRecommendationBanner(true);
+    
+    // AI 추천에 따라 컨트롤 업데이트
+    if (recommendation.material && MATERIALS.includes(recommendation.material)) {
+      setMaterial(recommendation.material);
+      setMaterialEnabled(true);
+    }
+    if (recommendation.color) {
+      setColor(recommendation.color);
+      setColorEnabled(true);
+    }
+    if (recommendation.finish) {
+      setFinishEnabled(true);
+    }
+    if (recommendation.description) {
+      setDescription(recommendation.description);
+      setDescriptionEnabled(true);
+    }
+  };
+
+  // AI 추천 적용
+  const applyAIRecommendation = () => {
+    if (aiRecommendation) {
+      if (aiRecommendation.material && MATERIALS.includes(aiRecommendation.material)) {
+        setMaterial(aiRecommendation.material);
+        setMaterialEnabled(true);
+      }
+      if (aiRecommendation.color) {
+        setColor(aiRecommendation.color);
+        setColorEnabled(true);
+      }
+      if (aiRecommendation.finish) {
+        setFinishEnabled(true);
+      }
+      if (aiRecommendation.description) {
+        setDescription(aiRecommendation.description);
+        setDescriptionEnabled(true);
+      }
+      setShowRecommendationBanner(false);
+    }
+  };
+
+  // AI 추천 무시
+  const dismissAIRecommendation = () => {
+    setShowRecommendationBanner(false);
   };
 
 
@@ -146,7 +214,7 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white from-10% via-pink-300 via-60% to-purple-400 to-90% text-gray-800 font-sans relative overflow-hidden">
-      <Header />
+      <Header onAIRecommendationClick={() => setIsAIModalOpen(true)} />
       <main className="container mx-auto px-4 py-20 relative z-10">
         {designerStep === 1 && (
           <div className="max-w-4xl mx-auto text-center space-y-12">
@@ -216,6 +284,64 @@ const App: React.FC = () => {
                         </div>
                     </div>
 
+                    {/* AI 추천 배너 */}
+                    {showRecommendationBanner && aiRecommendation && (
+                        <div className="space-y-4 bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 p-6 rounded-2xl shadow-lg">
+                            <div className="flex items-start justify-between">
+                                <div className="flex-1">
+                                    <h3 className="text-lg font-semibold text-purple-900 mb-2">🎨 AI 디자인 추천</h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                                        <div>
+                                            <span className="font-medium text-purple-800">추천 소재:</span>
+                                            <span className="ml-2 text-purple-700">{aiRecommendation.material}</span>
+                                        </div>
+                                        <div>
+                                            <span className="font-medium text-purple-800">추천 색상:</span>
+                                            <span className="ml-2 inline-flex items-center gap-2 text-purple-700">
+                                                <span className="w-4 h-4 rounded border border-gray-300" style={{backgroundColor: aiRecommendation.color}}></span>
+                                                {aiRecommendation.color}
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <span className="font-medium text-purple-800">추천 마감:</span>
+                                            <span className="ml-2 text-purple-700">{aiRecommendation.finish}</span>
+                                        </div>
+                                        <div>
+                                            <span className="font-medium text-purple-800">설명:</span>
+                                            <span className="ml-2 text-purple-700">{aiRecommendation.description}</span>
+                                        </div>
+                                    </div>
+                                    <p className="text-xs text-purple-600 mt-3 italic">{aiRecommendation.reasoning}</p>
+                                </div>
+                                <button
+                                    onClick={dismissAIRecommendation}
+                                    className="text-purple-400 hover:text-purple-600 ml-4"
+                                >
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={applyAIRecommendation}
+                                    className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium"
+                                >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    추천 적용하기
+                                </button>
+                                <button
+                                    onClick={dismissAIRecommendation}
+                                    className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium"
+                                >
+                                    무시하기
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
                     {/* Controls Section */}
                     {isReadyToGenerate && (
                         <div className="space-y-6 bg-white/80 backdrop-blur-lg p-8 rounded-2xl shadow-2xl border border-pink-300/70">
@@ -231,6 +357,14 @@ const App: React.FC = () => {
                                 isLoading={isLoading}
                                 isReady={isReadyToGenerate}
                                 isLimitReached={freeUsageCount >= 4}
+                                materialEnabled={materialEnabled}
+                                setMaterialEnabled={setMaterialEnabled}
+                                colorEnabled={colorEnabled}
+                                setColorEnabled={setColorEnabled}
+                                finishEnabled={finishEnabled}
+                                setFinishEnabled={setFinishEnabled}
+                                descriptionEnabled={descriptionEnabled}
+                                setDescriptionEnabled={setDescriptionEnabled}
                             />
                         </div>
                     )}
@@ -267,6 +401,13 @@ const App: React.FC = () => {
                 )}
             </>
         )}
+
+        {/* AI 추천 모달 */}
+        <AIRecommendationModal
+            isOpen={isAIModalOpen}
+            onClose={() => setIsAIModalOpen(false)}
+            onRecommendation={handleAIRecommendation}
+        />
 
       </main>
       <footer className="text-center py-6 text-slate-600 text-sm relative z-10">
