@@ -6,7 +6,7 @@ import { ResultDisplay } from './components/ResultDisplay';
 import { Loader } from './components/Loader';
 import { AIRecommendationModal, AIRecommendation } from './components/AIRecommendationModal';
 import { generateCmfDesign } from './services/geminiService';
-import { MATERIALS, FINISHES } from './constants';
+import { MATERIALS, MATERIAL_NAMES, FINISHES } from './constants';
 import { ChevronLeftIcon } from './components/icons/ChevronLeftIcon';
 
 const App: React.FC = () => {
@@ -18,7 +18,7 @@ const App: React.FC = () => {
   const [originalImages, setOriginalImages] = useState<Array<{ file: File | null; previewUrl: string | null }>>(
     Array.from({ length: 3 }, () => ({ file: null, previewUrl: null }))
   );
-  const [material, setMaterial] = useState<string>(MATERIALS[0]);
+  const [material, setMaterial] = useState<string>(MATERIALS[0].name);
   const [color, setColor] = useState<string>('#007aff'); // Apple-like blue
   const [finish, setFinish] = useState<string>(FINISHES[0]);
   const [description, setDescription] = useState<string>('');
@@ -159,7 +159,7 @@ const App: React.FC = () => {
     setOriginalImages(Array.from({ length: 3 }, () => ({ file: null, previewUrl: null })));
     setGeneratedImages([]);
     setError(null);
-    setMaterial(MATERIALS[0]);
+    setMaterial(MATERIALS[0].name);
     setColor('#007aff');
     setFinish(FINISHES[0]);
     setDescription('');
@@ -178,7 +178,7 @@ const App: React.FC = () => {
     setShowRecommendationBanner(true);
     
     // AI 추천에 따라 컨트롤 업데이트
-    if (recommendation.material && MATERIALS.includes(recommendation.material)) {
+    if (recommendation.material && MATERIAL_NAMES.includes(recommendation.material)) {
       setMaterial(recommendation.material);
       setMaterialEnabled(true);
     }
@@ -199,7 +199,7 @@ const App: React.FC = () => {
   // AI 추천 적용
   const applyAIRecommendation = () => {
     if (aiRecommendation) {
-      if (aiRecommendation.material && MATERIALS.includes(aiRecommendation.material)) {
+      if (aiRecommendation.material && MATERIAL_NAMES.includes(aiRecommendation.material)) {
         setMaterial(aiRecommendation.material);
         setMaterialEnabled(true);
       }

@@ -70,21 +70,38 @@ export const Controls: React.FC<ControlsProps> = ({
             />
           </button>
         </div>
-        <select
-          id="material"
-          value={material}
-          onChange={(e) => setMaterial(e.target.value)}
-          disabled={!materialEnabled}
-          className={`w-full border-gray-300 text-gray-900 rounded-lg focus:ring-purple-500 focus:border-purple-500 block p-3 text-base ${
-            materialEnabled ? 'bg-gray-100' : 'bg-gray-50 text-gray-400 cursor-not-allowed'
-          }`}
-        >
+        <div className="grid grid-cols-2 gap-3">
           {MATERIALS.map((mat) => (
-            <option key={mat} value={mat}>
-              {mat}
-            </option>
+            <div
+              key={mat.name}
+              onClick={() => materialEnabled && setMaterial(mat.name)}
+              className={`relative cursor-pointer rounded-lg border-2 transition-all duration-200 ${
+                material === mat.name 
+                  ? 'border-purple-500 bg-purple-50' 
+                  : 'border-gray-200 hover:border-gray-300'
+              } ${
+                !materialEnabled ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
+            >
+              <div className="p-3">
+                <div className="flex items-center space-x-3">
+                  <img
+                    src={mat.thumbnail}
+                    alt={mat.name}
+                    className="w-12 h-12 rounded-lg object-cover border border-gray-200"
+                  />
+                  <div className="flex-1">
+                    <h3 className={`text-sm font-medium ${
+                      material === mat.name ? 'text-purple-900' : 'text-gray-900'
+                    }`}>
+                      {mat.name}
+                    </h3>
+                  </div>
+                </div>
+              </div>
+            </div>
           ))}
-        </select>
+        </div>
       </div>
 
       {/* 색상 섹션 */}
