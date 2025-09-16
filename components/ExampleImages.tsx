@@ -59,22 +59,29 @@ export const ExampleImages: React.FC<ExampleImagesProps> = ({ onImageSelect }) =
             className="group relative aspect-square bg-gray-100 rounded-lg overflow-hidden border border-gray-200 cursor-pointer hover:border-purple-300 hover:shadow-md transition-all duration-200"
             onClick={() => handleImageClick(image.thumbnail)}
           >
-            {/* Placeholder for actual images */}
-            <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
-              <div className="text-center p-2">
-                <div className="text-xs text-gray-600 font-medium mb-1">{image.title}</div>
-                <div className="text-xs text-gray-500">{image.description}</div>
-              </div>
-            </div>
-            
-            {/* 실제 이미지 사용 시 아래 코드를 사용하세요 */}
-            {/*
+            {/* 실제 이미지 표시 */}
             <img
               src={image.thumbnail}
               alt={image.title}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+              onError={(e) => {
+                // 이미지 로드 실패 시 placeholder 표시
+                const target = e.target as HTMLImageElement;
+                target.style.display = 'none';
+                const parent = target.parentElement;
+                if (parent && !parent.querySelector('.fallback-placeholder')) {
+                  const placeholder = document.createElement('div');
+                  placeholder.className = 'fallback-placeholder w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center';
+                  placeholder.innerHTML = `
+                    <div class="text-center p-2">
+                      <div class="text-xs text-gray-600 font-medium mb-1">${image.title}</div>
+                      <div class="text-xs text-gray-500">${image.description}</div>
+                    </div>
+                  `;
+                  parent.appendChild(placeholder);
+                }
+              }}
             />
-            */}
             
             {/* Hover overlay */}
             <div className="absolute inset-0 bg-purple-500 bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-200 flex items-center justify-center">
