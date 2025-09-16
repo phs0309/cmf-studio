@@ -6,7 +6,7 @@ import { ResultDisplay } from './components/ResultDisplay';
 import { Loader } from './components/Loader';
 import { AIRecommendationModal, AIRecommendation } from './components/AIRecommendationModal';
 import { generateCmfDesign } from './services/geminiService';
-import { MATERIALS } from './constants';
+import { MATERIALS, FINISHES } from './constants';
 import { ChevronLeftIcon } from './components/icons/ChevronLeftIcon';
 
 const App: React.FC = () => {
@@ -20,6 +20,7 @@ const App: React.FC = () => {
   );
   const [material, setMaterial] = useState<string>(MATERIALS[0]);
   const [color, setColor] = useState<string>('#007aff'); // Apple-like blue
+  const [finish, setFinish] = useState<string>(FINISHES[0]);
   const [description, setDescription] = useState<string>('');
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -144,6 +145,7 @@ const App: React.FC = () => {
     setError(null);
     setMaterial(MATERIALS[0]);
     setColor('#007aff');
+    setFinish(FINISHES[0]);
     setDescription('');
     setMaterialEnabled(true);
     setColorEnabled(true);
@@ -168,7 +170,8 @@ const App: React.FC = () => {
       setColor(recommendation.color);
       setColorEnabled(true);
     }
-    if (recommendation.finish) {
+    if (recommendation.finish && FINISHES.includes(recommendation.finish)) {
+      setFinish(recommendation.finish);
       setFinishEnabled(true);
     }
     if (recommendation.description) {
@@ -188,7 +191,8 @@ const App: React.FC = () => {
         setColor(aiRecommendation.color);
         setColorEnabled(true);
       }
-      if (aiRecommendation.finish) {
+      if (aiRecommendation.finish && FINISHES.includes(aiRecommendation.finish)) {
+        setFinish(aiRecommendation.finish);
         setFinishEnabled(true);
       }
       if (aiRecommendation.description) {
@@ -214,7 +218,7 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white from-10% via-pink-300 via-60% to-purple-400 to-90% text-gray-800 font-sans relative overflow-hidden">
-      <Header onAIRecommendationClick={() => setIsAIModalOpen(true)} />
+      <Header />
       <main className="container mx-auto px-4 py-20 relative z-10">
         {designerStep === 1 && (
           <div className="max-w-4xl mx-auto text-center space-y-12">
@@ -345,12 +349,25 @@ const App: React.FC = () => {
                     {/* Controls Section */}
                     {isReadyToGenerate && (
                         <div className="space-y-6 bg-white/80 backdrop-blur-lg p-8 rounded-2xl shadow-2xl border border-pink-300/70">
-                            <h2 className="text-2xl font-semibold text-gray-900">2. 사용자 정의 및 생성</h2>
+                            <div className="flex items-center justify-between">
+                                <h2 className="text-2xl font-semibold text-gray-900">2. 사용자 정의 및 생성</h2>
+                                <button
+                                    onClick={() => setIsAIModalOpen(true)}
+                                    className="flex items-center gap-2 text-white bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 focus:ring-4 focus:ring-purple-200 font-medium rounded-lg text-sm px-4 py-2 transition-all duration-200 shadow-lg hover:shadow-xl"
+                                >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                                    </svg>
+                                    AI에게 물어보기
+                                </button>
+                            </div>
                             <Controls
                                 material={material}
                                 setMaterial={setMaterial}
                                 color={color}
                                 setColor={setColor}
+                                finish={finish}
+                                setFinish={setFinish}
                                 description={description}
                                 setDescription={setDescription}
                                 onGenerate={handleGenerate}

@@ -11,3 +11,11 @@ export const MATERIALS: string[] = [
   '양극처리 티타늄',
   '재활용 패브릭'
 ];
+
+export const FINISHES: string[] = [
+  '무광',
+  '유광',
+  '반광',
+  '소프트 터치',
+  '아노다이징'
+];

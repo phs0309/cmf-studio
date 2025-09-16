@@ -98,23 +98,23 @@ ${input.preferredColors ? `- 선호 색상: ${input.preferredColors}` : ''}
 function getDefaultRecommendation(input: AIRecommendationInput): AIRecommendationResult {
   const recommendations = [
     {
-      material: "알루미늄 합금",
+      material: "브러시드 알루미늄",
       color: "#4A90E2",
-      finish: "무광 마감",
+      finish: "무광",
       description: "모던하고 세련된 디자인으로 전문적인 느낌을 연출합니다.",
       reasoning: "2024년 트렌드인 미니멀 디자인과 프리미엄 소재 조합으로 인기가 높습니다."
     },
     {
-      material: "스테인리스 스틸",
+      material: "무광 플라스틱",
       color: "#2ECC71",
-      finish: "헤어라인 마감",
+      finish: "소프트 터치",
       description: "친환경적이면서도 내구성이 뛰어난 소재입니다.",
       reasoning: "환경 친화적인 소재 사용이 최신 트렌드이며 지속가능한 디자인을 추구합니다."
     },
     {
-      material: "세라믹",
+      material: "양극처리 티타늄",
       color: "#E67E22",
-      finish: "글로스 마감",
+      finish: "아노다이징",
       description: "따뜻하고 자연스러운 감성을 표현합니다.",
       reasoning: "자연 소재와 따뜻한 색감이 2024년 주요 트렌드로 주목받고 있습니다."
     }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { MATERIALS } from '../constants';
+import { MATERIALS, FINISHES } from '../constants';
 import { SparklesIcon } from './icons/SparklesIcon';
 
 interface ControlsProps {
@@ -7,6 +7,8 @@ interface ControlsProps {
   setMaterial: (material: string) => void;
   color: string;
   setColor: (color: string) => void;
+  finish: string;
+  setFinish: (finish: string) => void;
   description: string;
   setDescription: (description: string) => void;
   onGenerate: () => void;
@@ -28,6 +30,8 @@ export const Controls: React.FC<ControlsProps> = ({
   setMaterial,
   color,
   setColor,
+  finish,
+  setFinish,
   description,
   setDescription,
   onGenerate,
@@ -128,7 +132,7 @@ export const Controls: React.FC<ControlsProps> = ({
       {/* 마감 섹션 */}
       <div>
         <div className="flex items-center justify-between mb-3">
-          <label className="text-base font-medium text-gray-800">
+          <label htmlFor="finish" className="text-base font-medium text-gray-800">
             마감
           </label>
           <button
@@ -145,11 +149,21 @@ export const Controls: React.FC<ControlsProps> = ({
             />
           </button>
         </div>
-        <div className={`p-3 rounded-lg border border-gray-300 text-base ${
-          finishEnabled ? 'bg-gray-100 text-gray-900' : 'bg-gray-50 text-gray-400'
-        }`}>
-          {finishEnabled ? '마감 옵션이 활성화되었습니다' : '마감 옵션이 비활성화되었습니다'}
-        </div>
+        <select
+          id="finish"
+          value={finish}
+          onChange={(e) => setFinish(e.target.value)}
+          disabled={!finishEnabled}
+          className={`w-full border-gray-300 text-gray-900 rounded-lg focus:ring-purple-500 focus:border-purple-500 block p-3 text-base ${
+            finishEnabled ? 'bg-gray-100' : 'bg-gray-50 text-gray-400 cursor-not-allowed'
+          }`}
+        >
+          {FINISHES.map((finishOption) => (
+            <option key={finishOption} value={finishOption}>
+              {finishOption}
+            </option>
+          ))}
+        </select>
       </div>
 
       {/* 추가 설명 섹션 */}
