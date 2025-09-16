@@ -13,6 +13,22 @@ interface CMYKValues {
   k: number; // Key/Black (0-100)
 }
 
+// 인기 색상 팔레트 프리셋
+const COLOR_PRESETS = [
+  { name: '애플 블루', hex: '#007AFF', cmyk: { c: 100, m: 50, y: 0, k: 0 } },
+  { name: '레드', hex: '#FF3B30', cmyk: { c: 0, m: 90, y: 85, k: 0 } },
+  { name: '오렌지', hex: '#FF9500', cmyk: { c: 0, m: 50, y: 100, k: 0 } },
+  { name: '옐로우', hex: '#FFCC00', cmyk: { c: 0, m: 20, y: 100, k: 0 } },
+  { name: '그린', hex: '#34C759', cmyk: { c: 70, m: 0, y: 100, k: 0 } },
+  { name: '민트', hex: '#5AC8FA', cmyk: { c: 65, m: 0, y: 10, k: 0 } },
+  { name: '퍼플', hex: '#AF52DE', cmyk: { c: 50, m: 70, y: 0, k: 0 } },
+  { name: '핑크', hex: '#FF2D92', cmyk: { c: 0, m: 85, y: 30, k: 0 } },
+  { name: '다크 그레이', hex: '#8E8E93', cmyk: { c: 0, m: 0, y: 0, k: 45 } },
+  { name: '블랙', hex: '#000000', cmyk: { c: 0, m: 0, y: 0, k: 100 } },
+  { name: '화이트', hex: '#FFFFFF', cmyk: { c: 0, m: 0, y: 0, k: 0 } },
+  { name: '네이비', hex: '#1D1D1F', cmyk: { c: 100, m: 85, y: 25, k: 10 } },
+];
+
 export const CMYKColorPicker: React.FC<CMYKColorPickerProps> = ({
   value,
   onChange,
@@ -75,6 +91,12 @@ export const CMYKColorPicker: React.FC<CMYKColorPickerProps> = ({
     onChange(cmykToHex(newCmyk));
   };
 
+  // Handle color preset selection
+  const handlePresetSelect = (preset: typeof COLOR_PRESETS[0]) => {
+    setCmyk(preset.cmyk);
+    onChange(preset.hex);
+  };
+
   return (
     <div className="space-y-4">
       {/* Color preview */}
@@ -86,16 +108,40 @@ export const CMYKColorPicker: React.FC<CMYKColorPickerProps> = ({
         <div className="text-sm font-mono text-gray-600">{value}</div>
       </div>
 
+      {/* Color Palette Presets */}
+      <div>
+        <label className="block text-sm font-medium text-gray-800 mb-2">
+          색상 팔레트
+        </label>
+        <div className="grid grid-cols-6 gap-2">
+          {COLOR_PRESETS.map((preset) => (
+            <button
+              key={preset.name}
+              type="button"
+              onClick={() => !disabled && handlePresetSelect(preset)}
+              disabled={disabled}
+              className={`w-8 h-8 rounded-lg border-2 transition-all duration-200 hover:scale-110 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50 ${
+                value.toUpperCase() === preset.hex.toUpperCase()
+                  ? 'border-purple-500 ring-2 ring-purple-200 shadow-lg'
+                  : 'border-gray-200 hover:border-purple-300'
+              }`}
+              style={{ backgroundColor: preset.hex }}
+              title={preset.name}
+            />
+          ))}
+        </div>
+      </div>
+
       {/* CMYK sliders */}
-      <div className="grid grid-cols-1 gap-4">
+      <div className="grid grid-cols-1 gap-3">
         {/* Cyan */}
-        <div>
-          <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
+        <div className="bg-gray-50 p-3 rounded-lg">
+          <label className="flex items-center justify-between text-sm font-medium text-gray-800 mb-2">
             <span className="flex items-center gap-2">
-              <span className="w-4 h-4 bg-cyan-500 rounded"></span>
+              <span className="w-4 h-4 bg-cyan-500 rounded-full shadow-sm"></span>
               Cyan (C)
             </span>
-            <span>{cmyk.c}%</span>
+            <span className="text-purple-600 font-semibold">{cmyk.c}%</span>
           </label>
           <input
             type="range"
@@ -104,18 +150,18 @@ export const CMYKColorPicker: React.FC<CMYKColorPickerProps> = ({
             value={cmyk.c}
             onChange={(e) => handleCmykChange('c', parseInt(e.target.value))}
             disabled={disabled}
-            className="w-full h-2 bg-gradient-to-r from-white to-cyan-500 rounded-lg appearance-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+            className="w-full h-3 bg-gradient-to-r from-gray-100 to-cyan-500 rounded-lg appearance-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 slider-thumb"
           />
         </div>
 
         {/* Magenta */}
-        <div>
-          <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
+        <div className="bg-gray-50 p-3 rounded-lg">
+          <label className="flex items-center justify-between text-sm font-medium text-gray-800 mb-2">
             <span className="flex items-center gap-2">
-              <span className="w-4 h-4 bg-magenta-500 rounded" style={{backgroundColor: '#e91e63'}}></span>
+              <span className="w-4 h-4 rounded-full shadow-sm" style={{backgroundColor: '#e91e63'}}></span>
               Magenta (M)
             </span>
-            <span>{cmyk.m}%</span>
+            <span className="text-purple-600 font-semibold">{cmyk.m}%</span>
           </label>
           <input
             type="range"
@@ -124,21 +170,21 @@ export const CMYKColorPicker: React.FC<CMYKColorPickerProps> = ({
             value={cmyk.m}
             onChange={(e) => handleCmykChange('m', parseInt(e.target.value))}
             disabled={disabled}
-            className="w-full h-2 rounded-lg appearance-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+            className="w-full h-3 rounded-lg appearance-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 slider-thumb"
             style={{
-              background: `linear-gradient(to right, white, #e91e63)`
+              background: `linear-gradient(to right, #f3f4f6, #e91e63)`
             }}
           />
         </div>
 
         {/* Yellow */}
-        <div>
-          <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
+        <div className="bg-gray-50 p-3 rounded-lg">
+          <label className="flex items-center justify-between text-sm font-medium text-gray-800 mb-2">
             <span className="flex items-center gap-2">
-              <span className="w-4 h-4 bg-yellow-500 rounded"></span>
+              <span className="w-4 h-4 bg-yellow-500 rounded-full shadow-sm"></span>
               Yellow (Y)
             </span>
-            <span>{cmyk.y}%</span>
+            <span className="text-purple-600 font-semibold">{cmyk.y}%</span>
           </label>
           <input
             type="range"
@@ -147,18 +193,18 @@ export const CMYKColorPicker: React.FC<CMYKColorPickerProps> = ({
             value={cmyk.y}
             onChange={(e) => handleCmykChange('y', parseInt(e.target.value))}
             disabled={disabled}
-            className="w-full h-2 bg-gradient-to-r from-white to-yellow-500 rounded-lg appearance-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+            className="w-full h-3 bg-gradient-to-r from-gray-100 to-yellow-500 rounded-lg appearance-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 slider-thumb"
           />
         </div>
 
         {/* Key (Black) */}
-        <div>
-          <label className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
+        <div className="bg-gray-50 p-3 rounded-lg">
+          <label className="flex items-center justify-between text-sm font-medium text-gray-800 mb-2">
             <span className="flex items-center gap-2">
-              <span className="w-4 h-4 bg-black rounded"></span>
+              <span className="w-4 h-4 bg-black rounded-full shadow-sm"></span>
               Black (K)
             </span>
-            <span>{cmyk.k}%</span>
+            <span className="text-purple-600 font-semibold">{cmyk.k}%</span>
           </label>
           <input
             type="range"
@@ -167,14 +213,14 @@ export const CMYKColorPicker: React.FC<CMYKColorPickerProps> = ({
             value={cmyk.k}
             onChange={(e) => handleCmykChange('k', parseInt(e.target.value))}
             disabled={disabled}
-            className="w-full h-2 bg-gradient-to-r from-white to-black rounded-lg appearance-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+            className="w-full h-3 bg-gradient-to-r from-gray-100 to-black rounded-lg appearance-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 slider-thumb"
           />
         </div>
       </div>
 
       {/* Hex input */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+      <div className="bg-gray-50 p-3 rounded-lg">
+        <label className="block text-sm font-medium text-gray-800 mb-2">
           Hex Color
         </label>
         <input
@@ -182,7 +228,7 @@ export const CMYKColorPicker: React.FC<CMYKColorPickerProps> = ({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           disabled={disabled}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent font-mono text-sm disabled:bg-gray-50 disabled:text-gray-400 disabled:cursor-not-allowed"
+          className="w-full px-3 py-2 border border-gray-200 bg-white rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 font-mono text-sm transition-colors disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
           placeholder="#000000"
         />
       </div>
