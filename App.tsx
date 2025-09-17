@@ -8,7 +8,7 @@ import { AIRecommendationModal, AIRecommendation } from './components/AIRecommen
 import { generateCmfDesign } from './services/geminiService';
 import { MATERIALS, MATERIAL_NAMES, FINISHES, MaterialColorSet } from './constants';
 import { ChevronLeftIcon } from './components/icons/ChevronLeftIcon';
-import { initKeepAlive } from './utils/keepAlive';
+import { initKeepAlive } from './src/utils/keepAlive';
 
 const App: React.FC = () => {
   const [designerStep, setDesignerStep] = useState<1 | 2>(1);
