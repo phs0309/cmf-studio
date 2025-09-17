@@ -4,6 +4,13 @@ export interface Material {
   thumbnail: string;
 }
 
+export interface MaterialColorSet {
+  id: string;
+  material: string;
+  color: string;
+  enabled: boolean;
+}
+
 export const MATERIALS: Material[] = [
   { name: '플라스틱', thumbnail: '/materials/plastic.png' },
   { name: '브러시드 알루미늄', thumbnail: '/materials/brushed-aluminum.png' },

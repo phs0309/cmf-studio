@@ -1,13 +1,13 @@
 import React from 'react';
-import { MATERIALS, FINISHES } from '../constants';
+import { FINISHES, MaterialColorSet } from '../constants';
 import { SparklesIcon } from './icons/SparklesIcon';
-import { CMYKColorPicker } from './CMYKColorPicker';
+import { MaterialColorSets } from './MaterialColorSets';
 
 interface ControlsProps {
-  material: string;
-  setMaterial: (material: string) => void;
-  color: string;
-  setColor: (color: string) => void;
+  materialColorSets: MaterialColorSet[];
+  onAddSet: () => void;
+  onRemoveSet: (id: string) => void;
+  onUpdateSet: (id: string, updates: Partial<MaterialColorSet>) => void;
   finish: string;
   setFinish: (finish: string) => void;
   description: string;
@@ -16,10 +16,6 @@ interface ControlsProps {
   isLoading: boolean;
   isReady: boolean;
   isLimitReached?: boolean;
-  materialEnabled: boolean;
-  setMaterialEnabled: (enabled: boolean) => void;
-  colorEnabled: boolean;
-  setColorEnabled: (enabled: boolean) => void;
   finishEnabled: boolean;
   setFinishEnabled: (enabled: boolean) => void;
   descriptionEnabled: boolean;
@@ -27,10 +23,10 @@ interface ControlsProps {
 }
 
 export const Controls: React.FC<ControlsProps> = ({
-  material,
-  setMaterial,
-  color,
-  setColor,
+  materialColorSets,
+  onAddSet,
+  onRemoveSet,
+  onUpdateSet,
   finish,
   setFinish,
   description,
@@ -39,10 +35,6 @@ export const Controls: React.FC<ControlsProps> = ({
   isLoading,
   isReady,
   isLimitReached = false,
-  materialEnabled,
-  setMaterialEnabled,
-  colorEnabled,
-  setColorEnabled,
   finishEnabled,
   setFinishEnabled,
   descriptionEnabled,
@@ -50,88 +42,13 @@ export const Controls: React.FC<ControlsProps> = ({
 }) => {
   return (
     <div className="space-y-6">
-      {/* 소재 섹션 */}
-      <div>
-        <div className="flex items-center justify-between mb-3">
-          <label htmlFor="material" className="text-base font-medium text-gray-800">
-            소재
-          </label>
-          <button
-            type="button"
-            onClick={() => setMaterialEnabled(!materialEnabled)}
-            className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 ${
-              materialEnabled ? 'bg-purple-600' : 'bg-gray-200'
-            }`}
-          >
-            <span
-              className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                materialEnabled ? 'translate-x-5' : 'translate-x-0'
-              }`}
-            />
-          </button>
-        </div>
-        <div className="grid grid-cols-2 gap-3">
-          {MATERIALS.map((mat) => (
-            <div
-              key={mat.name}
-              onClick={() => materialEnabled && setMaterial(mat.name)}
-              className={`relative cursor-pointer rounded-lg border-2 transition-all duration-200 ${
-                material === mat.name 
-                  ? 'border-purple-500 bg-purple-50' 
-                  : 'border-gray-200 hover:border-gray-300'
-              } ${
-                !materialEnabled ? 'opacity-50 cursor-not-allowed' : ''
-              }`}
-            >
-              <div className="p-3">
-                <div className="flex items-center space-x-3">
-                  <img
-                    src={mat.thumbnail}
-                    alt={mat.name}
-                    className="w-12 h-12 rounded-lg object-cover border border-gray-200"
-                  />
-                  <div className="flex-1">
-                    <h3 className={`text-sm font-medium ${
-                      material === mat.name ? 'text-purple-900' : 'text-gray-900'
-                    }`}>
-                      {mat.name}
-                    </h3>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* 색상 섹션 */}
-      <div>
-        <div className="flex items-center justify-between mb-3">
-          <label htmlFor="color" className="text-base font-medium text-gray-800">
-            색상
-          </label>
-          <button
-            type="button"
-            onClick={() => setColorEnabled(!colorEnabled)}
-            className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 ${
-              colorEnabled ? 'bg-purple-600' : 'bg-gray-200'
-            }`}
-          >
-            <span
-              className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                colorEnabled ? 'translate-x-5' : 'translate-x-0'
-              }`}
-            />
-          </button>
-        </div>
-        <div className="mt-2">
-          <CMYKColorPicker
-            value={color}
-            onChange={setColor}
-            disabled={!colorEnabled}
-          />
-        </div>
-      </div>
+      {/* Material-Color Sets */}
+      <MaterialColorSets
+        sets={materialColorSets}
+        onAddSet={onAddSet}
+        onRemoveSet={onRemoveSet}
+        onUpdateSet={onUpdateSet}
+      />
 
       {/* 마감 섹션 */}
       <div>

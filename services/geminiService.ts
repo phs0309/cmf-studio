@@ -136,7 +136,7 @@ function getDefaultRecommendation(input: AIRecommendationInput): AIRecommendatio
   return recommendations[selectedIndex];
 }
 
-export const generateCmfDesign = async (imageFiles: File[], material: string, color: string, description?: string): Promise<string[]> => {
+export const generateCmfDesign = async (imageFiles: File[], materials: string[], colors: string[], description?: string): Promise<string[]> => {
   if (!process.env.API_KEY) {
     throw new Error("API_KEY environment variable not set");
   }
@@ -157,9 +157,14 @@ export const generateCmfDesign = async (imageFiles: File[], material: string, co
       },
     };
 
+    // Create material-color combinations description
+    const materialColorCombos = materials.map((material, idx) => 
+      `${material} with color ${colors[idx] || colors[0]}`
+    ).join(', ');
+    
     const basePrompt = `Please redesign the product shown in this image.
-Apply a '${material}' material and finish.
-Change its primary color to the hex code '${color}'.
+Apply the following material and color combinations: ${materialColorCombos}.
+If multiple combinations are provided, create a harmonious design that incorporates all of them appropriately.
 Maintain the original product shape, proportions, and background as much as possible.
 This is image ${i + 1} of ${imageFiles.length} images being processed with identical styling.`;
 

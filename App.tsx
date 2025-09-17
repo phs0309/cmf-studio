@@ -6,7 +6,7 @@ import { ResultDisplay } from './components/ResultDisplay';
 import { Loader } from './components/Loader';
 import { AIRecommendationModal, AIRecommendation } from './components/AIRecommendationModal';
 import { generateCmfDesign } from './services/geminiService';
-import { MATERIALS, MATERIAL_NAMES, FINISHES } from './constants';
+import { MATERIALS, MATERIAL_NAMES, FINISHES, MaterialColorSet } from './constants';
 import { ChevronLeftIcon } from './components/icons/ChevronLeftIcon';
 
 const App: React.FC = () => {
@@ -18,8 +18,10 @@ const App: React.FC = () => {
   const [originalImages, setOriginalImages] = useState<Array<{ file: File | null; previewUrl: string | null }>>(
     Array.from({ length: 3 }, () => ({ file: null, previewUrl: null }))
   );
-  const [material, setMaterial] = useState<string>(MATERIALS[0].name);
-  const [color, setColor] = useState<string>('#007aff'); // Apple-like blue
+  // Material-Color sets (max 3)
+  const [materialColorSets, setMaterialColorSets] = useState<MaterialColorSet[]>([
+    { id: '1', material: MATERIALS[0].name, color: '#007aff', enabled: true }
+  ]);
   const [finish, setFinish] = useState<string>(FINISHES[0]);
   const [description, setDescription] = useState<string>('');
   const [generatedImages, setGeneratedImages] = useState<string[]>([]);
@@ -27,8 +29,6 @@ const App: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   
   // Toggle states for each customization category
-  const [materialEnabled, setMaterialEnabled] = useState<boolean>(true);
-  const [colorEnabled, setColorEnabled] = useState<boolean>(true);
   const [finishEnabled, setFinishEnabled] = useState<boolean>(false);
   const [descriptionEnabled, setDescriptionEnabled] = useState<boolean>(false);
   
@@ -116,6 +116,31 @@ const App: React.FC = () => {
     setGeneratedImages([]);
     setError(null);
   };
+
+  // Material-Color set management
+  const addMaterialColorSet = () => {
+    if (materialColorSets.length < 3) {
+      const newSet: MaterialColorSet = {
+        id: Date.now().toString(),
+        material: MATERIALS[0].name,
+        color: '#007aff',
+        enabled: true
+      };
+      setMaterialColorSets([...materialColorSets, newSet]);
+    }
+  };
+
+  const removeMaterialColorSet = (id: string) => {
+    if (materialColorSets.length > 1) {
+      setMaterialColorSets(materialColorSets.filter(set => set.id !== id));
+    }
+  };
+
+  const updateMaterialColorSet = (id: string, updates: Partial<MaterialColorSet>) => {
+    setMaterialColorSets(materialColorSets.map(set => 
+      set.id === id ? { ...set, ...updates } : set
+    ));
+  };
   
   useEffect(() => {
     return () => {
@@ -147,7 +172,12 @@ const App: React.FC = () => {
     setGeneratedImages([]);
 
     try {
-      const newImagesBase64 = await generateCmfDesign(uploadedFiles, material, color, description);
+      // Get enabled material-color sets
+      const enabledSets = materialColorSets.filter(set => set.enabled);
+      const materials = enabledSets.map(set => set.material);
+      const colors = enabledSets.map(set => set.color);
+      
+      const newImagesBase64 = await generateCmfDesign(uploadedFiles, materials, colors, description);
       setGeneratedImages(newImagesBase64);
       
       // Increment free usage count and update timestamp
@@ -162,18 +192,15 @@ const App: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [originalImages, material, color, description, freeUsageCount]);
+  }, [originalImages, materialColorSets, description, freeUsageCount]);
   
   const handleRedo = () => {
     setOriginalImages(Array.from({ length: 3 }, () => ({ file: null, previewUrl: null })));
     setGeneratedImages([]);
     setError(null);
-    setMaterial(MATERIALS[0].name);
-    setColor('#007aff');
+    setMaterialColorSets([{ id: '1', material: MATERIALS[0].name, color: '#007aff', enabled: true }]);
     setFinish(FINISHES[0]);
     setDescription('');
-    setMaterialEnabled(true);
-    setColorEnabled(true);
     setFinishEnabled(false);
     setDescriptionEnabled(false);
     setAiRecommendation(null);
@@ -186,14 +213,18 @@ const App: React.FC = () => {
     setAiRecommendation(recommendation);
     setShowRecommendationBanner(true);
     
-    // AI 추천에 따라 컨트롤 업데이트
+    // AI 추천에 따라 첫 번째 세트 업데이트
     if (recommendation.material && MATERIAL_NAMES.includes(recommendation.material)) {
-      setMaterial(recommendation.material);
-      setMaterialEnabled(true);
+      updateMaterialColorSet(materialColorSets[0].id, { 
+        material: recommendation.material, 
+        enabled: true 
+      });
     }
     if (recommendation.color) {
-      setColor(recommendation.color);
-      setColorEnabled(true);
+      updateMaterialColorSet(materialColorSets[0].id, { 
+        color: recommendation.color, 
+        enabled: true 
+      });
     }
     if (recommendation.finish && FINISHES.includes(recommendation.finish)) {
       setFinish(recommendation.finish);
@@ -209,12 +240,16 @@ const App: React.FC = () => {
   const applyAIRecommendation = () => {
     if (aiRecommendation) {
       if (aiRecommendation.material && MATERIAL_NAMES.includes(aiRecommendation.material)) {
-        setMaterial(aiRecommendation.material);
-        setMaterialEnabled(true);
+        updateMaterialColorSet(materialColorSets[0].id, { 
+          material: aiRecommendation.material, 
+          enabled: true 
+        });
       }
       if (aiRecommendation.color) {
-        setColor(aiRecommendation.color);
-        setColorEnabled(true);
+        updateMaterialColorSet(materialColorSets[0].id, { 
+          color: aiRecommendation.color, 
+          enabled: true 
+        });
       }
       if (aiRecommendation.finish && FINISHES.includes(aiRecommendation.finish)) {
         setFinish(aiRecommendation.finish);
@@ -398,10 +433,10 @@ const App: React.FC = () => {
                                 </button>
                             </div>
                             <Controls
-                                material={material}
-                                setMaterial={setMaterial}
-                                color={color}
-                                setColor={setColor}
+                                materialColorSets={materialColorSets}
+                                onAddSet={addMaterialColorSet}
+                                onRemoveSet={removeMaterialColorSet}
+                                onUpdateSet={updateMaterialColorSet}
                                 finish={finish}
                                 setFinish={setFinish}
                                 description={description}
@@ -410,10 +445,6 @@ const App: React.FC = () => {
                                 isLoading={isLoading}
                                 isReady={isReadyToGenerate}
                                 isLimitReached={freeUsageCount >= 4}
-                                materialEnabled={materialEnabled}
-                                setMaterialEnabled={setMaterialEnabled}
-                                colorEnabled={colorEnabled}
-                                setColorEnabled={setColorEnabled}
                                 finishEnabled={finishEnabled}
                                 setFinishEnabled={setFinishEnabled}
                                 descriptionEnabled={descriptionEnabled}
