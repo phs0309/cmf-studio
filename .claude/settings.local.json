@@ -16,7 +16,9 @@
       "Bash(git stash:*)",
       "Bash(npm run dev:*)",
       "Bash(mkdir:*)",
-      "WebFetch(domain:designs.ai)"
+      "WebFetch(domain:designs.ai)",
+      "Bash(git rm:*)",
+      "Bash(git checkout:*)"
     ],
     "deny": [],
     "ask": []

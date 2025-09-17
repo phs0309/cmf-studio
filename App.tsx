@@ -293,9 +293,9 @@ const App: React.FC = () => {
           <div className="max-w-4xl mx-auto text-center space-y-12">
             {/* Hero Section */}
             <div className="space-y-6">
-              <h1 className="text-6xl font-bold text-slate-900 leading-tight">
-                CMF Vision
-              </h1>
+              <div className="flex justify-center">
+                <img src="/logos/logo2.png" alt="CMF Vision" className="h-12" />
+              </div>
               <h2 className="text-3xl font-semibold text-slate-800">
                 으로 스마트하고 빠르게<br />
                 아이디어를 완성하세요
@@ -472,14 +472,46 @@ const App: React.FC = () => {
                 <>
                     <ResultDisplay originalImageUrls={originalImageUrls} generatedImageUrls={generatedImages} />
                     {generatedImages.length > 0 && (
-                        <div className="max-w-5xl mx-auto mt-8 flex justify-center gap-4">
-                            <button
-                                onClick={handleRedo}
-                                className="text-gray-700 bg-white/90 hover:bg-white border border-gray-200 hover:border-gray-300 focus:ring-4 focus:ring-purple-200 font-bold rounded-xl text-base px-6 py-3 text-center transition-all duration-200 shadow-lg hover:shadow-xl backdrop-blur-sm"
-                            >
-                                다시 하기
-                            </button>
-                        </div>
+                        <>
+                            {/* Survey Section */}
+                            <div className="max-w-5xl mx-auto mt-12 bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-2xl p-8 text-center">
+                                <div className="space-y-4">
+                                    <h3 className="text-2xl font-bold text-purple-900">
+                                        🎉 디자인이 완성되었습니다!
+                                    </h3>
+                                    <p className="text-lg text-purple-700">
+                                        CMF Vision을 사용해보신 경험은 어떠셨나요?<br />
+                                        여러분의 소중한 의견을 듣고 싶습니다.
+                                    </p>
+                                    <div className="pt-4">
+                                        <a
+                                            href="https://docs.google.com/forms/d/e/1FAIpQLScj70Bfkf3BDxpD4Q0Aty6Y5W_s4xDRrRnGYBd9MayjGhdeQw/viewform?usp=dialog"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="inline-flex items-center gap-3 text-white text-lg font-bold bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 focus:ring-4 focus:ring-purple-200 rounded-xl px-8 py-4 transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105 transform"
+                                        >
+                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                            </svg>
+                                            설문조사 참여하기
+                                        </a>
+                                    </div>
+                                    <p className="text-sm text-purple-600">
+                                        설문은 약 2-3분 소요되며, 서비스 개선에 큰 도움이 됩니다.
+                                    </p>
+                                </div>
+                            </div>
+
+                            {/* Action Buttons */}
+                            <div className="max-w-5xl mx-auto mt-8 flex justify-center gap-4">
+                                <button
+                                    onClick={handleRedo}
+                                    className="text-gray-700 bg-white/90 hover:bg-white border border-gray-200 hover:border-gray-300 focus:ring-4 focus:ring-purple-200 font-bold rounded-xl text-base px-6 py-3 text-center transition-all duration-200 shadow-lg hover:shadow-xl backdrop-blur-sm"
+                                >
+                                    다시 하기
+                                </button>
+                            </div>
+                        </>
                     )}
                 </>
                 )}
