@@ -1,31 +1,30 @@
 import React from 'react';
 
-// 임시로 placeholder 이미지 데이터를 사용합니다.
-// 실제 구현 시에는 제공해주신 4개 이미지를 public/examples/ 폴더에 저장하고 경로를 사용하세요.
+// 예시 이미지 데이터 - public/examples/ 폴더의 실제 이미지들을 사용합니다.
 const EXAMPLE_IMAGES = [
   {
-    id: 'concept-car-1',
-    title: 'Concept Car 1',
-    thumbnail: '/examples/car1.png', // 실제 이미지 경로
-    description: 'Futuristic concept vehicle design',
+    id: 'ddug-device',
+    title: 'DDUG 디바이스',
+    thumbnail: '/examples/DDUG.png',
+    description: '혁신적인 스마트 디바이스 디자인',
   },
   {
-    id: 'concept-car-2', 
-    title: 'Concept Car 2',
-    thumbnail: '/examples/car2.png', // 실제 이미지 경로
-    description: 'Modern automotive concept',
+    id: 'hami-product', 
+    title: 'HAMI 제품',
+    thumbnail: '/examples/HAMI.png',
+    description: '모던하고 세련된 제품 디자인',
   },
   {
-    id: 'robot-charger-1',
-    title: 'Robot Charger 1',
-    thumbnail: '/examples/robot1.png', // 실제 이미지 경로
-    description: 'Robotic charging station design',
+    id: 'shusi-device',
+    title: 'SHUSI 기기',
+    thumbnail: '/examples/SHUSI.png',
+    description: '미니멀한 전자기기 디자인',
   },
   {
-    id: 'robot-charger-2',
-    title: 'Robot Charger 2', 
-    thumbnail: '/examples/robot2.png', // 실제 이미지 경로
-    description: 'Alternative robot charger view',
+    id: 'robot-charger',
+    title: '로봇 충전기', 
+    thumbnail: '/examples/robot2.png',
+    description: '로봇 충전 스테이션 디자인',
   },
 ];
 
