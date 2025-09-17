@@ -8,6 +8,7 @@ import { AIRecommendationModal, AIRecommendation } from './components/AIRecommen
 import { generateCmfDesign } from './services/geminiService';
 import { MATERIALS, MATERIAL_NAMES, FINISHES, MaterialColorSet } from './constants';
 import { ChevronLeftIcon } from './components/icons/ChevronLeftIcon';
+import { initKeepAlive } from './utils/keepAlive';
 
 const App: React.FC = () => {
   const [designerStep, setDesignerStep] = useState<1 | 2>(1);
@@ -70,6 +71,11 @@ const App: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
 
+  // Initialize keep-alive service
+  useEffect(() => {
+    const cleanup = initKeepAlive();
+    return cleanup;
+  }, []);
 
   const handleImagesUpload = (files: File[]) => {
     const newImages = [...originalImages];
@@ -422,17 +428,25 @@ const App: React.FC = () => {
                     {/* Controls Section */}
                     {isReadyToGenerate && (
                         <div className="space-y-6 bg-white/80 backdrop-blur-lg p-8 rounded-2xl shadow-2xl border border-pink-300/70">
-                            <div className="flex items-center justify-between">
-                                <h2 className="text-2xl font-semibold text-gray-900">2. 사용자 정의 및 생성</h2>
-                                <button
-                                    onClick={() => setIsAIModalOpen(true)}
-                                    className="flex items-center gap-2 text-white bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 focus:ring-4 focus:ring-purple-200 font-medium rounded-lg text-sm px-4 py-2 transition-all duration-200 shadow-lg hover:shadow-xl"
-                                >
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                                    </svg>
-                                    AI에게 물어보기
-                                </button>
+                            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                                <div>
+                                    <h2 className="text-2xl font-semibold text-gray-900 mb-2">2. 사용자 정의 및 생성</h2>
+                                    <p className="text-sm text-gray-600">직접 설정하거나 AI 추천을 받아 완벽한 CMF 디자인을 만들어보세요</p>
+                                </div>
+                                <div className="flex flex-col items-end gap-2">
+                                    <button
+                                        onClick={() => setIsAIModalOpen(true)}
+                                        className="flex items-center gap-2 text-white bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 focus:ring-4 focus:ring-purple-200 font-medium rounded-lg text-sm px-4 py-2 transition-all duration-200 shadow-lg hover:shadow-xl"
+                                    >
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                                        </svg>
+                                        🎨 AI 디자인 컨설팅
+                                    </button>
+                                    <span className="text-xs text-gray-500 text-right">
+                                        전문 디자이너 수준의 맞춤형 CMF 추천
+                                    </span>
+                                </div>
                             </div>
                             <Controls
                                 materialColorSets={materialColorSets}

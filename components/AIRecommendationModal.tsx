@@ -76,10 +76,31 @@ export const AIRecommendationModal: React.FC<AIRecommendationModalProps> = ({
           </div>
 
           {/* 설명 */}
-          <div className="mb-6 p-4 bg-purple-50 rounded-lg border border-purple-200">
-            <p className="text-sm text-purple-800">
-              <span className="font-semibold">AI가 최신 트렌드를 분석하여</span> 제품에 가장 적합한 색상, 소재, 마감을 추천해드립니다.
-            </p>
+          <div className="mb-6 p-5 bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl border border-purple-200">
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0 w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center mt-0.5">
+                <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <h3 className="text-sm font-bold text-purple-900 mb-2">🎨 AI 디자인 컨설턴트</h3>
+                <div className="space-y-2 text-sm text-purple-800">
+                  <p>
+                    <span className="font-semibold">Google Gemini AI</span>가 다음을 종합 분석하여 맞춤형 CMF 디자인을 제안합니다:
+                  </p>
+                  <ul className="list-disc list-inside space-y-1 ml-2 text-xs">
+                    <li><span className="font-medium">글로벌 디자인 트렌드</span> - 2024-2025 최신 색상 및 소재 동향</li>
+                    <li><span className="font-medium">타겟 사용자 분석</span> - 제품 용도에 따른 사용자 선호도</li>
+                    <li><span className="font-medium">브랜드 아이덴티티</span> - 제품 카테고리별 적합한 디자인 언어</li>
+                    <li><span className="font-medium">기능적 요소</span> - 실용성과 미학의 완벽한 조화</li>
+                  </ul>
+                  <p className="text-xs mt-3 bg-white/70 p-2 rounded border-l-3 border-purple-300">
+                    💡 <span className="font-medium">전문 디자이너 수준의 근거 기반 추천</span>을 받아보세요
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* 폼 */}

@@ -1,0 +1,17 @@
+name: Keep Render Service Alive
+
+on:
+  schedule:
+    # Run every 10 minutes
+    - cron: '*/10 * * * *'
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  keep-alive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping server
+        run: |
+          echo "Pinging server to keep it alive..."
+          curl -f https://cmf-studio.onrender.com/api/keep-alive || echo "Server ping failed"
+          echo "Ping completed at $(date)"
