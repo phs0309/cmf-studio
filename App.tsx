@@ -72,18 +72,16 @@ const App: React.FC = () => {
 
 
   const handleImagesUpload = (files: File[]) => {
-    // Clean up existing URLs
-    originalImages.forEach(image => {
-      if (image.previewUrl) {
-        URL.revokeObjectURL(image.previewUrl);
-      }
-    });
-
-    const newImages = Array.from({ length: 3 }, () => ({ file: null, previewUrl: null }));
-    files.forEach((file, index) => {
-      if (index < 3) {
+    const newImages = [...originalImages];
+    let addedCount = 0;
+    
+    files.forEach((file) => {
+      // Find first empty slot
+      const emptyIndex = newImages.findIndex(img => img.file === null);
+      if (emptyIndex !== -1 && addedCount < 3) {
         const previewUrl = URL.createObjectURL(file);
-        newImages[index] = { file, previewUrl };
+        newImages[emptyIndex] = { file, previewUrl };
+        addedCount++;
       }
     });
     
@@ -100,12 +98,23 @@ const App: React.FC = () => {
       const fileName = imagePath.split('/').pop() || 'example.jpg';
       const file = new File([blob], fileName, { type: blob.type });
       
-      // 기존 이미지들과 함께 처리
+      // 빈 슬롯에 이미지 추가
       handleImagesUpload([file]);
     } catch (error) {
       console.error('Error loading example image:', error);
       setError('예시 이미지를 불러오는데 실패했습니다.');
     }
+  };
+
+  const handleImageRemove = (index: number) => {
+    const newImages = [...originalImages];
+    if (newImages[index].previewUrl) {
+      URL.revokeObjectURL(newImages[index].previewUrl!);
+    }
+    newImages[index] = { file: null, previewUrl: null };
+    setOriginalImages(newImages);
+    setGeneratedImages([]);
+    setError(null);
   };
   
   useEffect(() => {
@@ -244,7 +253,7 @@ const App: React.FC = () => {
         }}
       ></div>
       <Header />
-      <main className="container mx-auto px-4 py-20 relative z-10">
+      <main className="container mx-auto px-4 pt-32 pb-20 relative z-10">
         {designerStep === 1 && (
           <div className="max-w-4xl mx-auto text-center space-y-12">
             {/* Hero Section */}
@@ -309,6 +318,7 @@ const App: React.FC = () => {
                             <ImageUploader
                                 onImagesUpload={handleImagesUpload}
                                 onExampleImageSelect={handleExampleImageSelect}
+                                onImageRemove={handleImageRemove}
                                 previewUrls={originalImages.map(img => img.previewUrl)}
                             />
                         </div>

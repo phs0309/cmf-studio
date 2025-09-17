@@ -5,10 +5,11 @@ import { ExampleImages } from './ExampleImages';
 interface ImageUploaderProps {
   onImagesUpload: (files: File[]) => void;
   onExampleImageSelect: (imagePath: string) => void;
+  onImageRemove?: (index: number) => void;
   previewUrls: (string | null)[];
 }
 
-export const ImageUploader: React.FC<ImageUploaderProps> = ({ onImagesUpload, onExampleImageSelect, previewUrls }) => {
+export const ImageUploader: React.FC<ImageUploaderProps> = ({ onImagesUpload, onExampleImageSelect, onImageRemove, previewUrls }) => {
   const [isDragging, setIsDragging] = useState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -62,8 +63,20 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({ onImagesUpload, on
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               {previewUrls.map((url, index) => (
                 url ? (
-                  <div key={index} className="aspect-square bg-gray-50 rounded-lg overflow-hidden">
+                  <div key={index} className="aspect-square bg-gray-50 rounded-lg overflow-hidden relative group">
                     <img src={url} alt={`제품 미리보기 ${index + 1}`} className="w-full h-full object-cover" />
+                    {onImageRemove && (
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          onImageRemove(index);
+                        }}
+                        className="absolute top-2 right-2 w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-xs font-bold"
+                      >
+                        ×
+                      </button>
+                    )}
                   </div>
                 ) : null
               ))}
