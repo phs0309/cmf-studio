@@ -9,6 +9,9 @@ interface ResultDisplayProps {
 export const ResultDisplay: React.FC<ResultDisplayProps> = ({ originalImageUrls, generatedImageUrls }) => {
   const [modalImage, setModalImage] = useState<{ url: string; title: string } | null>(null);
   
+  console.log('ResultDisplay - originalImageUrls:', originalImageUrls);
+  console.log('ResultDisplay - generatedImageUrls:', generatedImageUrls);
+  
   const hasOriginals = originalImageUrls.length > 0;
   const hasGenerated = generatedImageUrls.length > 0;
 

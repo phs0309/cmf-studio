@@ -7,7 +7,9 @@ export const Header: React.FC = () => {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center">
-            <img src="/logos/logo.png" alt="CMF Vision Logo" className="h-10" />
+            <a href="/" className="flex items-center">
+              <img src="/logos/logo.png" alt="CMF Vision Logo" className="h-10 cursor-pointer hover:opacity-80 transition-opacity" />
+            </a>
           </div>
           
           {/* Navigation Menu */}

@@ -271,6 +271,8 @@ const App: React.FC = () => {
 
   const isReadyToGenerate = originalImages.some(img => img.file !== null);
   const originalImageUrls = originalImages.map(img => img.previewUrl).filter((url): url is string => url !== null);
+  console.log('Original images:', originalImages);
+  console.log('Original image URLs:', originalImageUrls);
   const showResults = (generatedImages.length > 0 || (designerStep === 2 && isReadyToGenerate)) && !isLoading;
   
   const goToNextStep = () => setDesignerStep(2);
