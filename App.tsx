@@ -157,7 +157,21 @@ const App: React.FC = () => {
       
     } catch (err) {
       console.error(err);
-      setError(err instanceof Error ? err.message : 'An unknown error occurred. Please try again.');
+      let errorMessage = 'An unknown error occurred. Please try again.';
+      
+      if (err instanceof Error) {
+        if (err.message.includes('Timeout')) {
+          errorMessage = '처리 시간이 너무 오래 걸립니다. 이미지 크기를 줄이거나 더 간단한 설정으로 다시 시도해주세요.';
+        } else if (err.message.includes('API_KEY')) {
+          errorMessage = 'AI 서비스 설정에 문제가 있습니다. 잠시 후 다시 시도해주세요.';
+        } else if (err.message.includes('failed to fetch') || err.message.includes('network')) {
+          errorMessage = '네트워크 연결에 문제가 있습니다. 인터넷 연결을 확인하고 다시 시도해주세요.';
+        } else {
+          errorMessage = err.message;
+        }
+      }
+      
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -501,7 +515,8 @@ const App: React.FC = () => {
                 <div className="mt-16 flex flex-col items-center justify-center">
                     <Loader />
                     <p className="mt-4 text-lg text-gray-700">AI가 제품을 재디자인 중입니다...</p>
-                    <p className="text-sm text-gray-500">잠시만 기다려주세요.</p>
+                    <p className="text-sm text-gray-500">이미지 처리와 AI 생성에 2-5분 정도 소요됩니다.</p>
+                    <p className="text-xs text-gray-400 mt-2">네트워크 상태에 따라 시간이 더 걸릴 수 있습니다.</p>
                 </div>
                 )}
                 

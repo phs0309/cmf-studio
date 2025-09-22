@@ -18,6 +18,19 @@ import { database } from './database/connection';
 const app = express();
 const PORT = Number(process.env.PORT) || 3001;
 
+// Set timeout for all requests (10 minutes for AI processing)
+app.use((req, res, next) => {
+  // Set longer timeout for API routes that might involve AI processing
+  if (req.path.includes('/api/')) {
+    req.setTimeout(600000); // 10 minutes for API requests
+    res.setTimeout(600000);
+  } else {
+    req.setTimeout(30000);  // 30 seconds for other requests
+    res.setTimeout(30000);
+  }
+  next();
+});
+
 // Middleware
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' ? true : (process.env.CLIENT_URL || 'http://localhost:5173'),

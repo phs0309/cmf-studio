@@ -1,6 +1,54 @@
 
 import { GoogleGenAI, Modality } from "@google/genai";
 
+const compressImage = (file: File, maxWidth: number = 1024, quality: number = 0.8): Promise<File> => {
+  return new Promise((resolve, reject) => {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    
+    img.onload = () => {
+      // Calculate new dimensions
+      let { width, height } = img;
+      if (width > height) {
+        if (width > maxWidth) {
+          height = (height * maxWidth) / width;
+          width = maxWidth;
+        }
+      } else {
+        if (height > maxWidth) {
+          width = (width * maxWidth) / height;
+          height = maxWidth;
+        }
+      }
+      
+      canvas.width = width;
+      canvas.height = height;
+      
+      // Draw and compress
+      ctx?.drawImage(img, 0, 0, width, height);
+      canvas.toBlob(
+        (blob) => {
+          if (blob) {
+            const compressedFile = new File([blob], file.name, {
+              type: 'image/jpeg',
+              lastModified: Date.now(),
+            });
+            resolve(compressedFile);
+          } else {
+            reject(new Error('Image compression failed'));
+          }
+        },
+        'image/jpeg',
+        quality
+      );
+    };
+    
+    img.onerror = () => reject(new Error('Failed to load image'));
+    img.src = URL.createObjectURL(file);
+  });
+};
+
 const fileToBase64 = (file: File): Promise<string> =>
   new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -146,9 +194,17 @@ export const generateCmfDesign = async (imageFiles: File[], materials: string[],
   // Process each image individually to maintain consistency
   const results: string[] = [];
   
-  for (let i = 0; i < imageFiles.length; i++) {
-    const file = imageFiles[i];
-    const base64Data = await fileToBase64(file);
+  // Limit to first 2 images for faster processing
+  const limitedFiles = imageFiles.slice(0, 2);
+  
+  for (let i = 0; i < limitedFiles.length; i++) {
+    const file = limitedFiles[i];
+    
+    // Compress image for faster processing
+    const compressedFile = await compressImage(file, 800, 0.7);
+    const base64Data = await fileToBase64(compressedFile);
+    
+    console.log(`Image ${i + 1}: Original size: ${(file.size / 1024).toFixed(1)}KB, Compressed: ${(compressedFile.size / 1024).toFixed(1)}KB`);
     
     const imagePart = {
       inlineData: {
@@ -166,26 +222,32 @@ export const generateCmfDesign = async (imageFiles: File[], materials: string[],
 Apply the following material and color combinations: ${materialColorCombos}.
 If multiple combinations are provided, create a harmonious design that incorporates all of them appropriately.
 Maintain the original product shape, proportions, and background as much as possible.
-This is image ${i + 1} of ${imageFiles.length} images being processed with identical styling.`;
+This is image ${i + 1} of ${limitedFiles.length} images being processed with identical styling.`;
 
     const additionalDescription = description && description.trim() ? `\nAdditional requirements: ${description}` : '';
     
     const prompt = `${basePrompt}${additionalDescription}\nThe final output must be only the redesigned product image, with no additional text or commentary.`;
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash-image-preview',
-      contents: {
-        parts: [
-          imagePart,
-          {
-            text: prompt,
-          },
-        ],
-      },
-      config: {
-          responseModalities: [Modality.IMAGE, Modality.TEXT],
-      },
-    });
+    // Add timeout wrapper for individual API calls
+    const response = await Promise.race([
+      ai.models.generateContent({
+        model: 'gemini-2.5-flash-image-preview',
+        contents: {
+          parts: [
+            imagePart,
+            {
+              text: prompt,
+            },
+          ],
+        },
+        config: {
+            responseModalities: [Modality.IMAGE, Modality.TEXT],
+        },
+      }),
+      new Promise((_, reject) => 
+        setTimeout(() => reject(new Error(`Timeout: Image ${i + 1} processing took too long`)), 300000) // 5 minutes per image
+      )
+    ]) as any;
     
     let imageFound = false;
     for (const part of response.candidates?.[0]?.content?.parts || []) {
@@ -221,12 +283,17 @@ This is image ${i + 1} of ${imageFiles.length} images being processed with ident
 
 응답은 한국어로 250-300자 정도로 작성해주세요.`;
 
-  const explanationResponse = await ai.models.generateContent({
-    model: 'gemini-2.5-flash',
-    contents: {
-      parts: [{ text: explanationPrompt }],
-    },
-  });
+  const explanationResponse = await Promise.race([
+    ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: {
+        parts: [{ text: explanationPrompt }],
+      },
+    }),
+    new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('Timeout: Explanation generation took too long')), 60000) // 1 minute for explanation
+    )
+  ]) as any;
 
   const explanation = explanationResponse.candidates?.[0]?.content?.parts?.[0]?.text || 
     `이번 디자인에서는 ${materialColorCombos}을 적용하여 현대적이고 세련된 느낌을 연출했습니다. 선택된 소재와 색상은 2024-2025년 최신 트렌드를 반영하며, 사용자의 라이프스타일과 제품의 기능성을 고려하여 선정되었습니다. 전체적으로 미니멀하면서도 프리미엄한 감성을 표현하여 현대 소비자들의 니즈에 부합하는 디자인을 완성했습니다.`;
