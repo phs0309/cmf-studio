@@ -86,12 +86,17 @@ export const getAIRecommendation = async (
   } catch (error) {
     console.error('AI 추천 생성 중 오류:', error);
     
-    // 에러 시 기본 추천 제공
-    return {
-      material: MATERIALS[0].name,
-      color: '#007aff',
-      finish: FINISHES[0],
-      reasoning: '기본 추천입니다. 다시 시도해주세요.'
-    };
+    // API 키 관련 오류 처리
+    if (error instanceof Error && error.message.includes('API key')) {
+      throw new Error('AI 추천 서비스 설정에 문제가 있습니다. 관리자에게 문의해주세요.');
+    }
+    
+    // 기타 오류 처리
+    if (error instanceof Error && error.message.includes('400')) {
+      throw new Error('요청 처리 중 오류가 발생했습니다. 입력 정보를 확인하고 다시 시도해주세요.');
+    }
+    
+    // 일반적인 오류
+    throw new Error('AI 추천 생성 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
   }
 };
