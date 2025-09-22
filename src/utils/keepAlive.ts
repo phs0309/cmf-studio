@@ -1,7 +1,9 @@
 // Keep server alive by pinging it periodically
 export const startKeepAlive = () => {
   const PING_INTERVAL = 10 * 60 * 1000; // 10 minutes
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+  const API_URL = import.meta.env.PROD 
+    ? 'https://cmf-studio-backend.onrender.com/api'
+    : 'http://localhost:3001/api';
   
   const pingServer = async () => {
     try {
