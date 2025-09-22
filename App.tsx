@@ -199,8 +199,8 @@ const App: React.FC = () => {
     setDesignerStep(1);
   };
 
-  // AI 추천 처리
-  const handleAIRecommendation = (recommendation: AIRecommendation) => {
+  // AI 추천 결과 처리 (모달용)
+  const handleAIRecommendationModal = (recommendation: AIRecommendation) => {
     setAiRecommendation(recommendation);
     setShowRecommendationBanner(true);
     
@@ -592,7 +592,7 @@ const App: React.FC = () => {
         <AIRecommendationModal
             isOpen={isAIModalOpen}
             onClose={() => setIsAIModalOpen(false)}
-            onRecommendation={handleAIRecommendation}
+            onRecommendation={handleAIRecommendationModal}
         />
 
       </main>
