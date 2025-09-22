@@ -44,12 +44,12 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
           </div>
           
           {/* Navigation Menu */}
-          <nav className="hidden md:flex items-center space-x-8">
+          <nav className="hidden md:flex items-center justify-center space-x-8 absolute left-1/2 transform -translate-x-1/2">
             {/* Create Dropdown */}
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setIsCreateDropdownOpen(!isCreateDropdownOpen)}
-                className="flex items-center gap-1 text-slate-900 hover:text-slate-700 font-bold transition-colors"
+                className="flex items-center gap-1 text-indigo-900 hover:text-indigo-700 font-bold transition-colors"
               >
                 Create
                 <svg 
@@ -76,16 +76,16 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
                     onClick={() => handleCreateClick('blueprint-to-cmf')}
                     className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors border-t border-gray-100"
                   >
-                    <div className="font-medium">설계도를 CMF로</div>
-                    <div className="text-xs text-gray-500 mt-1">설계도를 실제 제품으로 변환</div>
+                    <div className="font-medium">스케치를 CMF로</div>
+                    <div className="text-xs text-gray-500 mt-1">스케치를 실제 제품으로 변환</div>
                   </button>
                 </div>
               )}
             </div>
             
-            <a href="#" className="text-slate-900 hover:text-slate-700 font-bold transition-colors">Tutorial</a>
-            <a href="#" className="text-slate-900 hover:text-slate-700 font-bold transition-colors">Library</a>
-            <a href="#" className="text-slate-900 hover:text-slate-700 font-bold transition-colors">Price</a>
+            <a href="#" className="text-indigo-900 hover:text-indigo-700 font-bold transition-colors">Tutorial</a>
+            <a href="#" className="text-indigo-900 hover:text-indigo-700 font-bold transition-colors">Library</a>
+            <a href="#" className="text-indigo-900 hover:text-indigo-700 font-bold transition-colors">Price</a>
           </nav>
           
           {/* Mobile Menu Button */}

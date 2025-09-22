@@ -13,8 +13,6 @@ interface ImageUploaderProps {
   onProductNameChange: (name: string) => void;
   productPurpose: string;
   onProductPurposeChange: (purpose: string) => void;
-  productTarget: string;
-  onProductTargetChange: (target: string) => void;
 }
 
 export const ImageUploader: React.FC<ImageUploaderProps> = ({ 
@@ -27,9 +25,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
   productName,
   onProductNameChange,
   productPurpose,
-  onProductPurposeChange,
-  productTarget,
-  onProductTargetChange
+  onProductPurposeChange
 }) => {
   const [isDragging, setIsDragging] = useState(false);
 
@@ -138,32 +134,18 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
         {/* Product Purpose */}
         <div className="space-y-2">
           <label htmlFor="product-purpose" className="block text-sm font-medium text-gray-700">
-            용도/목적 <span className="text-red-500">*</span>
+            타겟, 목적 <span className="text-red-500">*</span>
           </label>
           <input
             id="product-purpose"
             type="text"
             value={productPurpose}
             onChange={(e) => onProductPurposeChange(e.target.value)}
-            placeholder="예: 휴대폰 보호, 음악 감상, 업무용, 게임용"
+            placeholder="예: 20-30대 직장인을 위한 휴대폰 보호, 학생용 음악 감상, 게이머용 헤드셋"
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm"
           />
         </div>
 
-        {/* Target User */}
-        <div className="space-y-2">
-          <label htmlFor="product-target" className="block text-sm font-medium text-gray-700">
-            타겟 사용자 <span className="text-red-500">*</span>
-          </label>
-          <input
-            id="product-target"
-            type="text"
-            value={productTarget}
-            onChange={(e) => onProductTargetChange(e.target.value)}
-            placeholder="예: 20-30대 직장인, 학생, 게이머, 시니어"
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm"
-          />
-        </div>
 
         {/* Image Description */}
         <div className="space-y-2">
