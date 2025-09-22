@@ -16,14 +16,7 @@ export const getAIRecommendation = async (
   imageFiles?: File[]
 ): Promise<AIRecommendationResult> => {
   if (!API_KEY) {
-    console.warn('AI API 키가 설정되지 않아 기본 추천을 제공합니다.');
-    // API 키가 없을 때 기본 추천 제공
-    return {
-      material: MATERIALS[0].name,
-      color: '#007aff',
-      finish: FINISHES[0],
-      reasoning: '현재 AI 서비스가 일시적으로 사용할 수 없어 기본 추천을 제공합니다. 잠시 후 다시 시도해주세요.'
-    };
+    throw new Error('AI 추천 서비스에 일시적인 문제가 발생했습니다. 잠시 후 다시 시도해주세요.');
   }
 
   const ai = new GoogleGenAI({ apiKey: API_KEY });
