@@ -282,8 +282,7 @@ export const BlueprintToCMF: React.FC<BlueprintToCMFProps> = ({ onNavigateHome }
   };
 
   const isReadyToGenerate = originalImages.some(img => img.file !== null);
-  const originalImageUrls = originalImages.map(img => img.previewUrl).filter((url): url is string => url !== null);
-  const showResults = (generatedImages.length > 0 || isReadyToGenerate) && !isLoading;
+  const showResults = (generatedImages.length > 0) && !isLoading;
 
   return (
     <div className="max-w-5xl mx-auto space-y-8">
@@ -374,7 +373,7 @@ export const BlueprintToCMF: React.FC<BlueprintToCMFProps> = ({ onNavigateHome }
       
       {showResults && (
         <>
-          <ResultDisplay originalImageUrls={originalImageUrls} generatedImageUrls={generatedImages} />
+          <ResultDisplay generatedImageUrls={generatedImages} />
           
           {/* Design Explanation */}
           {designExplanation && generatedImages.length > 0 && (

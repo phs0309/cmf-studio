@@ -409,10 +409,7 @@ const App: React.FC = () => {
 
 
   const isReadyToGenerate = originalImages.some(img => img.file !== null);
-  const originalImageUrls = originalImages.map(img => img.previewUrl).filter((url): url is string => url !== null);
-  console.log('Original images:', originalImages);
-  console.log('Original image URLs:', originalImageUrls);
-  const showResults = (generatedImages.length > 0 || (designerStep === 2 && isReadyToGenerate)) && !isLoading;
+  const showResults = (generatedImages.length > 0) && !isLoading;
   
   const goToNextStep = () => setDesignerStep(2);
   const goToPrevStep = () => setDesignerStep(1);
@@ -624,7 +621,7 @@ const App: React.FC = () => {
                 
                 {showResults && (
                 <>
-                    <ResultDisplay originalImageUrls={originalImageUrls} generatedImageUrls={generatedImages} />
+                    <ResultDisplay generatedImageUrls={generatedImages} />
                     
                     {/* Design Explanation */}
                     {designExplanation && generatedImages.length > 0 && (
