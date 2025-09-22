@@ -285,16 +285,14 @@ const App: React.FC = () => {
   const goToPrevStep = () => setDesignerStep(1);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white from-10% via-pink-300 via-60% to-purple-400 to-90% text-gray-800 font-sans relative overflow-hidden">
-      {/* Dot pattern background */}
-      <div 
-        className="absolute inset-0 opacity-20"
-        style={{
-          backgroundImage: `radial-gradient(circle, rgba(255,255,255,0.8) 1px, transparent 1px)`,
-          backgroundSize: '20px 20px',
-          backgroundPosition: '0 0, 10px 10px'
-        }}
-      ></div>
+    <div className="min-h-screen text-gray-800 font-sans relative overflow-hidden" style={{
+      backgroundImage: `url('/logos/back.png')`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundRepeat: 'no-repeat'
+    }}>
+      {/* Optional overlay for better text readability */}
+      <div className="absolute inset-0 bg-white/10"></div>
       <Header />
       <main className="container mx-auto px-4 pt-32 pb-20 relative z-10">
         {designerStep === 1 && (
