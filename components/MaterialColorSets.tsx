@@ -9,8 +9,6 @@ interface MaterialColorSetsProps {
   onAddSet: () => void;
   onRemoveSet: (id: string) => void;
   onUpdateSet: (id: string, updates: Partial<MaterialColorSet>) => void;
-  onAIRecommendMaterial?: (setId: string) => void;
-  onAIRecommendColor?: (setId: string) => void;
 }
 
 export const MaterialColorSets: React.FC<MaterialColorSetsProps> = ({
@@ -18,8 +16,6 @@ export const MaterialColorSets: React.FC<MaterialColorSetsProps> = ({
   onAddSet,
   onRemoveSet,
   onUpdateSet,
-  onAIRecommendMaterial,
-  onAIRecommendColor,
 }) => {
   return (
     <div className="space-y-6">
@@ -80,20 +76,8 @@ export const MaterialColorSets: React.FC<MaterialColorSetsProps> = ({
             <div className={`space-y-4 ${!set.enabled ? 'opacity-50' : ''}`}>
               {/* 소재 선택 */}
               <div>
-                <div className="flex items-center justify-between mb-2">
+                <div className="mb-2">
                   <label className="text-sm font-medium text-gray-700">소재</label>
-                  {onAIRecommendMaterial && (
-                    <button
-                      onClick={() => onAIRecommendMaterial(set.id)}
-                      disabled={!set.enabled}
-                      className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-purple-600 bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                    >
-                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                      </svg>
-                      AI 추천
-                    </button>
-                  )}
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   {MATERIALS.map((material) => (
@@ -131,20 +115,8 @@ export const MaterialColorSets: React.FC<MaterialColorSetsProps> = ({
 
               {/* 색상 선택 */}
               <div>
-                <div className="flex items-center justify-between mb-2">
+                <div className="mb-2">
                   <label className="text-sm font-medium text-gray-700">색상</label>
-                  {onAIRecommendColor && (
-                    <button
-                      onClick={() => onAIRecommendColor(set.id)}
-                      disabled={!set.enabled}
-                      className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-purple-600 bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                    >
-                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                      </svg>
-                      AI 추천
-                    </button>
-                  )}
                 </div>
                 <CMYKColorPicker
                   value={set.color}

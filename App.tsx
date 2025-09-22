@@ -7,6 +7,7 @@ import { Loader } from './components/Loader';
 import { AIRecommendationModal, AIRecommendation } from './components/AIRecommendationModal';
 import { BlueprintToCMF } from './components/BlueprintToCMF';
 import { generateCmfDesign } from './services/geminiService';
+import { getAIRecommendation } from './src/services/aiRecommendationService';
 import { MATERIALS, MATERIAL_NAMES, FINISHES, MaterialColorSet } from './constants';
 import { ChevronLeftIcon } from './components/icons/ChevronLeftIcon';
 import { initKeepAlive } from './src/utils/keepAlive';
@@ -35,6 +36,7 @@ const App: React.FC = () => {
   const [designExplanation, setDesignExplanation] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [isAIRecommending, setIsAIRecommending] = useState<boolean>(false);
   
   // Toggle states for each customization category
   const [finishEnabled, setFinishEnabled] = useState<boolean>(false);
@@ -257,155 +259,54 @@ const App: React.FC = () => {
     setShowRecommendationBanner(false);
   };
 
-  // AI 소재 추천
-  const handleAIRecommendMaterial = async (setId: string) => {
+  // AI 추천 처리
+  const handleAIRecommendation = async () => {
     if (!productName || !productPurpose) {
       alert('제품 정보를 모두 입력해주세요 (제품명, 타겟/목적)');
       return;
     }
 
-    // 제품 정보를 기반으로 맞춤형 소재 추천
-    let recommendedMaterials = MATERIALS;
-    
-    // 용도에 따른 소재 필터링
-    if (productPurpose.includes('보호') || productPurpose.includes('케이스')) {
-      recommendedMaterials = MATERIALS.filter(m => 
-        m.name.includes('실리콘') || m.name.includes('TPU') || m.name.includes('하드')
-      );
-    } else if (productPurpose.includes('업무') || productPurpose.includes('전문') || productPurpose.includes('직장인')) {
-      recommendedMaterials = MATERIALS.filter(m => 
-        m.name.includes('Metal') || m.name.includes('Glass') || m.name.includes('알루미늄')
-      );
-    } else if (productPurpose.includes('게임') || productPurpose.includes('엔터') || productPurpose.includes('게이머')) {
-      recommendedMaterials = MATERIALS.filter(m => 
-        m.name.includes('RGB') || m.name.includes('투명') || m.name.includes('아크릴')
-      );
-    }
-    
-    // 타겟에 따른 추가 필터링
-    if (productPurpose.includes('시니어') || productPurpose.includes('연세') || productPurpose.includes('중년')) {
-      recommendedMaterials = recommendedMaterials.filter(m => 
-        !m.name.includes('투명') && !m.name.includes('글로시')
-      );
-    } else if (productPurpose.includes('학생') || productPurpose.includes('젊은') || productPurpose.includes('10대') || productPurpose.includes('20대')) {
-      recommendedMaterials = recommendedMaterials.filter(m => 
-        m.name.includes('컬러풀') || m.name.includes('투명') || m.name.includes('패턴')
-      );
-    }
-    
-    
-    if (recommendedMaterials.length === 0) {
-      recommendedMaterials = MATERIALS;
-    }
-    
-    const randomMaterial = recommendedMaterials[Math.floor(Math.random() * recommendedMaterials.length)];
-    
-    updateMaterialColorSet(setId, { 
-      material: randomMaterial?.name || MATERIALS[0].name,
-      enabled: true 
-    });
-    
-    alert(`🎨 AI 추천: ${randomMaterial?.name}\n\n${productName}을 위한 맞춤 소재입니다. ${productPurpose}에 최적화되었으며, 최신 2024-2025 트렌드를 반영하여 선택되었습니다.`);
-  };
+    setIsAIRecommending(true);
+    try {
+      // 업로드된 이미지 파일들 가져오기
+      const uploadedFiles = originalImages
+        .map(img => img.file)
+        .filter((file): file is File => file !== null);
 
-  // AI 색상 추천
-  const handleAIRecommendColor = async (setId: string) => {
-    if (!productName || !productPurpose) {
-      alert('제품 정보를 모두 입력해주세요 (제품명, 타겟/목적)');
-      return;
-    }
+      const recommendation = await getAIRecommendation(
+        productName,
+        productPurpose,
+        uploadedFiles.length > 0 ? uploadedFiles : undefined
+      );
 
-    // 제품 정보에 따른 색상 카테고리 분류
-    let colorPalette: string[] = [];
-    let colorReason = '';
-    
-    // 타겟에 따른 색상 선택
-    if (productPurpose.includes('직장인') || productPurpose.includes('업무') || productPurpose.includes('전문')) {
-      colorPalette = ['#2C3E50', '#34495E', '#7F8C8D', '#95A5A6', '#BDC3C7']; // 전문적인 색상
-      colorReason = '전문적이고 신뢰감 있는 색상';
-    } else if (productPurpose.includes('학생') || productPurpose.includes('젊은') || productPurpose.includes('10대') || productPurpose.includes('20대')) {
-      colorPalette = ['#FF6B35', '#E74C3C', '#9B59B6', '#3498DB', '#1ABC9C', '#F39C12']; // 활기찬 색상
-      colorReason = '활기차고 트렌디한 젊은 감성의 색상';
-    } else if (productPurpose.includes('시니어') || productPurpose.includes('연세') || productPurpose.includes('중년')) {
-      colorPalette = ['#8E44AD', '#2980B9', '#27AE60', '#E67E22', '#C0392B']; // 차분한 색상
-      colorReason = '차분하고 우아한 성숙한 색상';
-    } else if (productPurpose.includes('게이머') || productPurpose.includes('게임')) {
-      colorPalette = ['#E74C3C', '#9B59B6', '#3498DB', '#1ABC9C', '#F39C12', '#E67E22']; // 역동적 색상
-      colorReason = '게이밍에 특화된 역동적인 색상';
-    }
-    
-    
-    // 용도에 따른 추가 색상 조정
-    if (productPurpose.includes('보호') || productPurpose.includes('안전')) {
-      colorPalette = ['#2C3E50', '#34495E', '#7F8C8D', '#27AE60']; // 안전한 느낌의 색상
-      colorReason = '보호와 안전성을 강조하는 색상';
-    } else if (productPurpose.includes('음악') || productPurpose.includes('엔터')) {
-      colorPalette = ['#9B59B6', '#E74C3C', '#F39C12', '#1ABC9C']; // 창의적 색상
-      colorReason = '음악과 엔터테인먼트에 어울리는 창의적인 색상';
-    }
-    
-    // 기본 트렌드 색상 사용
-    if (colorPalette.length === 0) {
-      colorPalette = ['#FF6B35', '#2E8B57', '#4A90E2', '#8E44AD', '#F39C12', '#E74C3C', '#1ABC9C', '#34495E'];
-      colorReason = '2024-2025 최신 트렌드 색상';
-    }
-    
-    const randomColor = colorPalette[Math.floor(Math.random() * colorPalette.length)];
-    
-    updateMaterialColorSet(setId, { 
-      color: randomColor,
-      enabled: true 
-    });
-    
-    alert(`🎨 AI 추천 색상: ${randomColor}\n\n${productName}을 위한 ${colorReason}입니다. ${productPurpose}에 최적화되었습니다.`);
-  };
+      // 추천 결과 적용
+      if (materialColorSets.length > 0) {
+        updateMaterialColorSet(materialColorSets[0].id, {
+          material: recommendation.material,
+          color: recommendation.color,
+          enabled: true
+        });
+      }
+      
+      setFinish(recommendation.finish);
+      setFinishEnabled(true);
 
-  // AI 마감 추천
-  const handleAIRecommendFinish = async () => {
-    if (!productName || !productPurpose) {
-      alert('제품 정보를 모두 입력해주세요 (제품명, 타겟/목적)');
-      return;
-    }
+      // 추천 결과 모달로 표시
+      setAiRecommendation({
+        material: recommendation.material,
+        color: recommendation.color,
+        finish: recommendation.finish,
+        description: '',
+        reasoning: recommendation.reasoning
+      });
+      setShowRecommendationBanner(true);
 
-    // 제품 정보에 따른 마감 추천
-    let recommendedFinish = '';
-    let finishReason = '';
-    
-    // 용도에 따른 마감 선택
-    if (productPurpose.includes('업무') || productPurpose.includes('전문') || productPurpose.includes('비즈니스') || productPurpose.includes('직장인')) {
-      recommendedFinish = 'Brushed';
-      finishReason = '전문적이고 세련된 브러시 마감으로 업무 환경에 적합합니다';
-    } else if (productPurpose.includes('보호') || productPurpose.includes('케이스')) {
-      recommendedFinish = 'Matte';
-      finishReason = '무광 마감으로 지문이 잘 안 묻고 그립감이 우수합니다';
-    } else if (productPurpose.includes('게임') || productPurpose.includes('엔터') || productPurpose.includes('게이머')) {
-      recommendedFinish = 'Glossy';
-      finishReason = '광택 마감으로 화려하고 역동적인 게이밍 분위기를 연출합니다';
-    } else if (productPurpose.includes('음악') || productPurpose.includes('오디오')) {
-      recommendedFinish = 'Premium Matte';
-      finishReason = '프리미엄 무광 마감으로 고급스러운 오디오 기기 느낌을 제공합니다';
+    } catch (error) {
+      console.error('AI 추천 오류:', error);
+      alert('추천 생성 중 오류가 발생했습니다. 다시 시도해주세요.');
+    } finally {
+      setIsAIRecommending(false);
     }
-    
-    // 타겟에 따른 추가 조정
-    if (productPurpose.includes('시니어') || productPurpose.includes('연세') || productPurpose.includes('중년')) {
-      recommendedFinish = 'Textured';
-      finishReason = '텍스처 마감으로 미끄럼 방지 효과와 안정감을 제공합니다';
-    } else if (productPurpose.includes('학생') || productPurpose.includes('젊은') || productPurpose.includes('10대') || productPurpose.includes('20대')) {
-      recommendedFinish = 'Satin';
-      finishReason = '새틴 마감으로 부드럽고 모던한 젊은 감성을 표현합니다';
-    }
-    
-    
-    // 기본값 설정
-    if (!recommendedFinish) {
-      recommendedFinish = 'Premium Matte';
-      finishReason = '2024-2025 트렌드를 반영한 프리미엄 무광 마감입니다';
-    }
-    
-    setFinish(recommendedFinish);
-    setFinishEnabled(true);
-    
-    alert(`🎨 AI 추천 마감: ${recommendedFinish}\n\n${productName}을 위한 마감입니다. ${productPurpose}에 최적화되었으며, ${finishReason}.`);
   };
 
 
@@ -595,9 +496,8 @@ const App: React.FC = () => {
                                 setFinishEnabled={setFinishEnabled}
                                 descriptionEnabled={descriptionEnabled}
                                 setDescriptionEnabled={setDescriptionEnabled}
-                                onAIRecommendMaterial={handleAIRecommendMaterial}
-                                onAIRecommendColor={handleAIRecommendColor}
-                                onAIRecommendFinish={handleAIRecommendFinish}
+                                onAIRecommendation={handleAIRecommendation}
+                                isAIRecommending={isAIRecommending}
                             />
                         </div>
                     )}
