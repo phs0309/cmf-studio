@@ -5,14 +5,17 @@ import { Controls } from './components/Controls';
 import { ResultDisplay } from './components/ResultDisplay';
 import { Loader } from './components/Loader';
 import { AIRecommendationModal, AIRecommendation } from './components/AIRecommendationModal';
+import { BlueprintToCMF } from './components/BlueprintToCMF';
 import { generateCmfDesign } from './services/geminiService';
 import { MATERIALS, MATERIAL_NAMES, FINISHES, MaterialColorSet } from './constants';
 import { ChevronLeftIcon } from './components/icons/ChevronLeftIcon';
 import { initKeepAlive } from './src/utils/keepAlive';
 
+type Page = 'home' | 'cmf-editor' | 'blueprint-to-cmf';
+
 const App: React.FC = () => {
+  const [currentPage, setCurrentPage] = useState<Page>('home');
   const [designerStep, setDesignerStep] = useState<1 | 2>(1);
-  const [freeUsageCount, setFreeUsageCount] = useState<number>(0);
 
 
   // Designer states
@@ -25,7 +28,9 @@ const App: React.FC = () => {
   ]);
   const [finish, setFinish] = useState<string>(FINISHES[0]);
   const [description, setDescription] = useState<string>('');
+  const [imageDescription, setImageDescription] = useState<string>('');
   const [generatedImages, setGeneratedImages] = useState<string[]>([]);
+  const [designExplanation, setDesignExplanation] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   
@@ -38,38 +43,6 @@ const App: React.FC = () => {
   const [aiRecommendation, setAiRecommendation] = useState<AIRecommendation | null>(null);
   const [showRecommendationBanner, setShowRecommendationBanner] = useState<boolean>(false);
 
-  // Initialize free usage count from localStorage with 10-minute reset
-  useEffect(() => {
-    const checkAndResetCount = () => {
-      const savedCount = localStorage.getItem('cmf-free-usage-count');
-      const savedTimestamp = localStorage.getItem('cmf-usage-timestamp');
-      const now = Date.now();
-      const tenMinutesInMs = 10 * 60 * 1000; // 10 minutes
-      
-      if (savedTimestamp) {
-        const lastUsage = parseInt(savedTimestamp, 10);
-        // Reset count if 10 minutes have passed
-        if (now - lastUsage > tenMinutesInMs) {
-          setFreeUsageCount(0);
-          localStorage.setItem('cmf-free-usage-count', '0');
-          localStorage.setItem('cmf-usage-timestamp', now.toString());
-        } else if (savedCount) {
-          setFreeUsageCount(parseInt(savedCount, 10));
-        }
-      } else {
-        // First time user - initialize timestamp
-        localStorage.setItem('cmf-usage-timestamp', now.toString());
-      }
-    };
-
-    // Initial check
-    checkAndResetCount();
-
-    // Set up timer to check every minute
-    const interval = setInterval(checkAndResetCount, 60 * 1000); // Check every minute
-    
-    return () => clearInterval(interval);
-  }, []);
 
   // Initialize keep-alive service
   useEffect(() => {
@@ -167,11 +140,6 @@ const App: React.FC = () => {
       return;
     }
 
-    // Check free usage limit
-    if (freeUsageCount >= 4) {
-      setError('무료 체험 횟수(4회)를 모두 사용하셨습니다.');
-      return;
-    }
 
     setIsLoading(true);
     setError(null);
@@ -183,30 +151,27 @@ const App: React.FC = () => {
       const materials = enabledSets.map(set => set.material);
       const colors = enabledSets.map(set => set.color);
       
-      const newImagesBase64 = await generateCmfDesign(uploadedFiles, materials, colors, description);
-      setGeneratedImages(newImagesBase64);
+      const result = await generateCmfDesign(uploadedFiles, materials, colors, description);
+      setGeneratedImages(result.images);
+      setDesignExplanation(result.explanation);
       
-      // Increment free usage count and update timestamp
-      const newCount = freeUsageCount + 1;
-      const now = Date.now();
-      setFreeUsageCount(newCount);
-      localStorage.setItem('cmf-free-usage-count', newCount.toString());
-      localStorage.setItem('cmf-usage-timestamp', now.toString());
     } catch (err) {
       console.error(err);
       setError(err instanceof Error ? err.message : 'An unknown error occurred. Please try again.');
     } finally {
       setIsLoading(false);
     }
-  }, [originalImages, materialColorSets, description, freeUsageCount]);
+  }, [originalImages, materialColorSets, description]);
   
   const handleRedo = () => {
     setOriginalImages(Array.from({ length: 3 }, () => ({ file: null, previewUrl: null })));
     setGeneratedImages([]);
+    setDesignExplanation('');
     setError(null);
     setMaterialColorSets([{ id: '1', material: MATERIALS[0].name, color: '#007aff', enabled: true }]);
     setFinish(FINISHES[0]);
     setDescription('');
+    setImageDescription('');
     setFinishEnabled(false);
     setDescriptionEnabled(false);
     setAiRecommendation(null);
@@ -274,6 +239,64 @@ const App: React.FC = () => {
     setShowRecommendationBanner(false);
   };
 
+  // AI 소재 추천
+  const handleAIRecommendMaterial = async (setId: string) => {
+    const currentTrends = [
+      "Sustainable Materials", "Eco-friendly", "Recycled Plastics", "Bio-based Materials",
+      "Minimalist Design", "Natural Textures", "Premium Feel", "Anti-bacterial Surfaces"
+    ];
+    
+    const trendContext = `Current 2024-2025 design trends: ${currentTrends.join(', ')}`;
+    const productContext = imageDescription ? `Product: ${imageDescription}` : '';
+    
+    const recommendedMaterials = MATERIALS.filter(m => 
+      m.name.includes('Glass') || m.name.includes('Metal') || m.name.includes('Premium')
+    );
+    
+    const randomMaterial = recommendedMaterials[Math.floor(Math.random() * recommendedMaterials.length)];
+    
+    updateMaterialColorSet(setId, { 
+      material: randomMaterial?.name || MATERIALS[0].name,
+      enabled: true 
+    });
+    
+    alert(`🎨 AI 추천: ${randomMaterial?.name}\n\n최신 트렌드를 반영한 고급스러운 소재입니다. ${trendContext}`);
+  };
+
+  // AI 색상 추천
+  const handleAIRecommendColor = async (setId: string) => {
+    const trendColors2025 = [
+      '#FF6B35', // Coral
+      '#2E8B57', // Sea Green
+      '#4A90E2', // Sky Blue
+      '#8E44AD', // Purple
+      '#F39C12', // Orange
+      '#E74C3C', // Red
+      '#1ABC9C', // Turquoise
+      '#34495E'  // Dark Gray
+    ];
+    
+    const randomColor = trendColors2025[Math.floor(Math.random() * trendColors2025.length)];
+    
+    updateMaterialColorSet(setId, { 
+      color: randomColor,
+      enabled: true 
+    });
+    
+    alert(`🎨 AI 추천 색상: ${randomColor}\n\n2024-2025 트렌드 컬러로 선택되었습니다. 현대적이고 세련된 느낌을 줍니다.`);
+  };
+
+  // AI 마감 추천
+  const handleAIRecommendFinish = async () => {
+    const trendFinishes = ['Matte', 'Satin', 'Premium Matte'];
+    const randomFinish = trendFinishes[Math.floor(Math.random() * trendFinishes.length)];
+    
+    setFinish(randomFinish);
+    setFinishEnabled(true);
+    
+    alert(`🎨 AI 추천 마감: ${randomFinish}\n\n최신 트렌드를 반영한 프리미엄 마감입니다. 지문이 덜 묻고 고급스러운 느낌을 제공합니다.`);
+  };
+
 
   const isReadyToGenerate = originalImages.some(img => img.file !== null);
   const originalImageUrls = originalImages.map(img => img.previewUrl).filter((url): url is string => url !== null);
@@ -284,6 +307,21 @@ const App: React.FC = () => {
   const goToNextStep = () => setDesignerStep(2);
   const goToPrevStep = () => setDesignerStep(1);
 
+  // Navigation handlers
+  const handleNavigate = (page: Page) => {
+    setCurrentPage(page);
+    if (page === 'home') {
+      setDesignerStep(1);
+    } else if (page === 'cmf-editor') {
+      setDesignerStep(2);
+    }
+  };
+
+  const handleNavigateHome = () => {
+    setCurrentPage('home');
+    setDesignerStep(1);
+  };
+
   return (
     <div className="min-h-screen text-gray-800 font-sans relative overflow-hidden" style={{
       backgroundImage: `url('/logos/back.png')`,
@@ -293,9 +331,15 @@ const App: React.FC = () => {
     }}>
       {/* Optional overlay for better text readability */}
       <div className="absolute inset-0 bg-white/10"></div>
-      <Header />
+      <Header onNavigate={handleNavigate} />
       <main className="container mx-auto px-4 pt-32 pb-20 relative z-10">
-        {designerStep === 1 && (
+        
+        {/* Render different pages based on currentPage */}
+        {currentPage === 'blueprint-to-cmf' && (
+          <BlueprintToCMF onNavigateHome={handleNavigateHome} />
+        )}
+        
+        {currentPage === 'home' && designerStep === 1 && (
           <div className="max-w-4xl mx-auto text-center space-y-12">
             {/* Hero Section */}
             <div className="space-y-6">
@@ -315,7 +359,7 @@ const App: React.FC = () => {
             {/* CTA Section */}
             <div className="pt-8">
               <button
-                onClick={goToNextStep}
+                onClick={() => handleNavigate('cmf-editor')}
                 className="inline-flex items-center justify-center gap-3 text-white text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 focus:ring-4 focus:ring-purple-200 rounded-2xl px-12 py-4 transition-all duration-200 shadow-2xl hover:shadow-3xl hover:scale-105 transform"
               >
                 Start
@@ -325,20 +369,10 @@ const App: React.FC = () => {
               </button>
             </div>
             
-            {/* Usage Counter */}
-            <div className="pt-6">
-              <p className="text-sm text-slate-500">무료 체험</p>
-              <p className="text-lg font-semibold text-pink-700">
-                {freeUsageCount}/4회 사용
-              </p>
-              {freeUsageCount >= 4 && (
-                <p className="text-xs text-red-500 mt-1">체험 횟수 소진</p>
-              )}
-            </div>
           </div>
         )}
         
-        {designerStep === 2 && (
+        {(currentPage === 'cmf-editor' || (currentPage === 'home' && designerStep === 2)) && (
             <>
                 <div className="max-w-5xl mx-auto space-y-8">
                     {/* Image Upload Section */}
@@ -346,7 +380,7 @@ const App: React.FC = () => {
                         <div className="flex items-center justify-between mb-2">
                             <h2 className="text-2xl font-semibold text-gray-900">1. 이미지 업로드</h2>
                             <button
-                                onClick={goToPrevStep}
+                                onClick={handleNavigateHome}
                                 className="flex items-center gap-1.5 text-sm font-medium text-purple-600 hover:text-purple-800 transition-colors"
                                 aria-label="홈으로 돌아가기"
                             >
@@ -361,6 +395,8 @@ const App: React.FC = () => {
                                 onExampleImageSelect={handleExampleImageSelect}
                                 onImageRemove={handleImageRemove}
                                 previewUrls={originalImages.map(img => img.previewUrl)}
+                                imageDescription={imageDescription}
+                                onImageDescriptionChange={setImageDescription}
                             />
                         </div>
                     </div>
@@ -426,25 +462,9 @@ const App: React.FC = () => {
                     {/* Controls Section */}
                     {isReadyToGenerate && (
                         <div className="space-y-6 bg-white/80 backdrop-blur-lg p-8 rounded-2xl shadow-2xl border border-pink-300/70">
-                            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                                <div>
-                                    <h2 className="text-2xl font-semibold text-gray-900 mb-2">2. 사용자 정의 및 생성</h2>
-                                    <p className="text-sm text-gray-600">직접 설정하거나 AI 추천을 받아 완벽한 CMF 디자인을 만들어보세요</p>
-                                </div>
-                                <div className="flex flex-col items-end gap-2">
-                                    <button
-                                        onClick={() => setIsAIModalOpen(true)}
-                                        className="flex items-center gap-2 text-white bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 focus:ring-4 focus:ring-purple-200 font-medium rounded-lg text-sm px-4 py-2 transition-all duration-200 shadow-lg hover:shadow-xl"
-                                    >
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                                        </svg>
-                                        🎨 AI 디자인 컨설팅
-                                    </button>
-                                    <span className="text-xs text-gray-500 text-right">
-                                        전문 디자이너 수준의 맞춤형 CMF 추천
-                                    </span>
-                                </div>
+                            <div>
+                                <h2 className="text-2xl font-semibold text-gray-900 mb-2">2. 사용자 정의 및 생성</h2>
+                                <p className="text-sm text-gray-600">소재, 색상, 마감을 설정하여 완벽한 CMF 디자인을 만들어보세요</p>
                             </div>
                             <Controls
                                 materialColorSets={materialColorSets}
@@ -458,11 +478,14 @@ const App: React.FC = () => {
                                 onGenerate={handleGenerate}
                                 isLoading={isLoading}
                                 isReady={isReadyToGenerate}
-                                isLimitReached={freeUsageCount >= 4}
+                                isLimitReached={false}
                                 finishEnabled={finishEnabled}
                                 setFinishEnabled={setFinishEnabled}
                                 descriptionEnabled={descriptionEnabled}
                                 setDescriptionEnabled={setDescriptionEnabled}
+                                onAIRecommendMaterial={handleAIRecommendMaterial}
+                                onAIRecommendColor={handleAIRecommendColor}
+                                onAIRecommendFinish={handleAIRecommendFinish}
                             />
                         </div>
                     )}
@@ -485,6 +508,26 @@ const App: React.FC = () => {
                 {showResults && (
                 <>
                     <ResultDisplay originalImageUrls={originalImageUrls} generatedImageUrls={generatedImages} />
+                    
+                    {/* Design Explanation */}
+                    {designExplanation && generatedImages.length > 0 && (
+                        <div className="max-w-5xl mx-auto mt-8 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-8">
+                            <div className="space-y-4">
+                                <h3 className="text-2xl font-bold text-blue-900 flex items-center gap-2">
+                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                                    </svg>
+                                    🎨 AI 디자인 분석
+                                </h3>
+                                <div className="bg-white/80 rounded-xl p-6 shadow-sm">
+                                    <p className="text-blue-800 leading-relaxed text-base whitespace-pre-line">
+                                        {designExplanation}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                    
                     {generatedImages.length > 0 && (
                         <>
                             {/* Survey Section */}

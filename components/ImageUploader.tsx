@@ -7,9 +7,11 @@ interface ImageUploaderProps {
   onExampleImageSelect: (imagePath: string) => void;
   onImageRemove?: (index: number) => void;
   previewUrls: (string | null)[];
+  imageDescription: string;
+  onImageDescriptionChange: (description: string) => void;
 }
 
-export const ImageUploader: React.FC<ImageUploaderProps> = ({ onImagesUpload, onExampleImageSelect, onImageRemove, previewUrls }) => {
+export const ImageUploader: React.FC<ImageUploaderProps> = ({ onImagesUpload, onExampleImageSelect, onImageRemove, previewUrls, imageDescription, onImageDescriptionChange }) => {
   const [isDragging, setIsDragging] = useState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -94,6 +96,21 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({ onImagesUpload, on
         )}
         <input id="dropzone-file" type="file" className="hidden" onChange={handleFileChange} accept="image/png, image/jpeg, image/webp" multiple />
       </label>
+      
+      {/* Image Description Input */}
+      <div className="space-y-2">
+        <label htmlFor="image-description" className="block text-sm font-medium text-gray-700">
+          이미지 설명 (선택사항)
+        </label>
+        <textarea
+          id="image-description"
+          value={imageDescription}
+          onChange={(e) => onImageDescriptionChange(e.target.value)}
+          placeholder="제품에 대한 설명을 입력해주세요 (예: 스마트폰 케이스, 무선 이어폰 등)"
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none text-sm"
+          rows={3}
+        />
+      </div>
       
       {/* Example Images Section */}
       <ExampleImages onImageSelect={onExampleImageSelect} />

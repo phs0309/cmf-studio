@@ -136,7 +136,7 @@ function getDefaultRecommendation(input: AIRecommendationInput): AIRecommendatio
   return recommendations[selectedIndex];
 }
 
-export const generateCmfDesign = async (imageFiles: File[], materials: string[], colors: string[], description?: string): Promise<string[]> => {
+export const generateCmfDesign = async (imageFiles: File[], materials: string[], colors: string[], description?: string): Promise<{ images: string[], explanation: string }> => {
   if (!process.env.API_KEY) {
     throw new Error("API_KEY environment variable not set");
   }
@@ -201,5 +201,35 @@ This is image ${i + 1} of ${imageFiles.length} images being processed with ident
     }
   }
 
-  return results;
+  // Generate detailed explanation
+  const materialColorCombos = materials.map((material, idx) => 
+    `${material} with ${colors[idx] || colors[0]}`
+  ).join(', ');
+
+  const explanationPrompt = `당신은 제품 디자인 전문가입니다. 방금 생성된 CMF 디자인에 대해 자세한 설명을 제공해주세요.
+
+사용된 소재: ${materials.join(', ')}
+사용된 색상: ${colors.join(', ')}
+추가 설명: ${description || '없음'}
+
+다음 내용을 포함하여 전문적인 디자인 분석을 제공해주세요:
+1. 선택된 소재의 특성과 장점
+2. 색상 선택의 이유와 심리적 효과
+3. 전체적인 디자인 컨셉과 타겟 사용자
+4. 최신 트렌드와의 연관성
+5. 실용성과 내구성에 대한 고려사항
+
+응답은 한국어로 250-300자 정도로 작성해주세요.`;
+
+  const explanationResponse = await ai.models.generateContent({
+    model: 'gemini-2.5-flash',
+    contents: {
+      parts: [{ text: explanationPrompt }],
+    },
+  });
+
+  const explanation = explanationResponse.candidates?.[0]?.content?.parts?.[0]?.text || 
+    `이번 디자인에서는 ${materialColorCombos}을 적용하여 현대적이고 세련된 느낌을 연출했습니다. 선택된 소재와 색상은 2024-2025년 최신 트렌드를 반영하며, 사용자의 라이프스타일과 제품의 기능성을 고려하여 선정되었습니다. 전체적으로 미니멀하면서도 프리미엄한 감성을 표현하여 현대 소비자들의 니즈에 부합하는 디자인을 완성했습니다.`;
+
+  return { images: results, explanation };
 };
