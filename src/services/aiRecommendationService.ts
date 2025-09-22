@@ -1,5 +1,5 @@
 import { GoogleGenerativeAI } from '@google/genai';
-import { MATERIALS, FINISHES } from '../constants';
+import { MATERIALS, FINISHES } from '../../constants';
 
 const API_KEY = import.meta.env.VITE_API_KEY || import.meta.env.API_KEY;
 
