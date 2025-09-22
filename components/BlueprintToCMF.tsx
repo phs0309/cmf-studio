@@ -17,6 +17,9 @@ export const BlueprintToCMF: React.FC<BlueprintToCMFProps> = ({ onNavigateHome }
     Array.from({ length: 3 }, () => ({ file: null, previewUrl: null }))
   );
   const [imageDescription, setImageDescription] = useState<string>('');
+  const [productName, setProductName] = useState<string>('');
+  const [productPurpose, setProductPurpose] = useState<string>('');
+  const [productTarget, setProductTarget] = useState<string>('');
   
   // CMF states
   const [materialColorSets, setMaterialColorSets] = useState<MaterialColorSet[]>([
@@ -107,9 +110,33 @@ export const BlueprintToCMF: React.FC<BlueprintToCMFProps> = ({ onNavigateHome }
 
   // AI recommendation handlers
   const handleAIRecommendMaterial = async (setId: string) => {
-    const blueprintMaterials = MATERIALS.filter(m => 
-      m.name.includes('Metal') || m.name.includes('Plastic') || m.name.includes('Carbon')
-    );
+    if (!productName || !productPurpose || !productTarget) {
+      alert('제품 정보를 모두 입력해주세요 (제품명, 용도, 타겟 사용자)');
+      return;
+    }
+
+    // 설계도 기반 제품의 소재 추천 로직
+    let blueprintMaterials = MATERIALS;
+    
+    if (productPurpose.includes('구조') || productPurpose.includes('프레임')) {
+      blueprintMaterials = MATERIALS.filter(m => 
+        m.name.includes('Metal') || m.name.includes('Steel') || m.name.includes('Aluminum')
+      );
+    } else if (productPurpose.includes('외장') || productPurpose.includes('케이스')) {
+      blueprintMaterials = MATERIALS.filter(m => 
+        m.name.includes('Plastic') || m.name.includes('ABS') || m.name.includes('PC')
+      );
+    } else if (productPurpose.includes('고성능') || productPurpose.includes('전문')) {
+      blueprintMaterials = MATERIALS.filter(m => 
+        m.name.includes('Carbon') || m.name.includes('Titanium') || m.name.includes('Ceramic')
+      );
+    }
+    
+    if (blueprintMaterials.length === 0) {
+      blueprintMaterials = MATERIALS.filter(m => 
+        m.name.includes('Metal') || m.name.includes('Plastic') || m.name.includes('Carbon')
+      );
+    }
     
     const randomMaterial = blueprintMaterials[Math.floor(Math.random() * blueprintMaterials.length)];
     
@@ -118,39 +145,77 @@ export const BlueprintToCMF: React.FC<BlueprintToCMFProps> = ({ onNavigateHome }
       enabled: true 
     });
     
-    alert(`🎨 AI 추천: ${randomMaterial?.name}\n\n설계도 구현에 적합한 실용적인 소재입니다. 내구성과 제조 효율성을 고려하여 선택되었습니다.`);
+    alert(`🎨 AI 추천: ${randomMaterial?.name}\n\n${productName} 설계도를 ${productPurpose} 목적으로 구현하기 위한 ${productTarget} 맞춤 소재입니다. 제조 효율성과 내구성을 고려했습니다.`);
   };
 
   const handleAIRecommendColor = async (setId: string) => {
-    const professionalColors = [
-      '#2C3E50', // Dark Blue
-      '#34495E', // Dark Gray
-      '#7F8C8D', // Gray
-      '#95A5A6', // Light Gray
-      '#BDC3C7', // Silver
-      '#ECF0F1', // Light Silver
-      '#E74C3C', // Red (accent)
-      '#3498DB'  // Blue (accent)
-    ];
+    if (!productName || !productPurpose || !productTarget) {
+      alert('제품 정보를 모두 입력해주세요 (제품명, 용도, 타겟 사용자)');
+      return;
+    }
+
+    // 설계도 기반 제품의 색상 추천
+    let colorPalette: string[] = [];
+    let colorReason = '';
     
-    const randomColor = professionalColors[Math.floor(Math.random() * professionalColors.length)];
+    // 공업/기술 제품 특성에 맞는 색상 선택
+    if (productPurpose.includes('산업') || productPurpose.includes('공업')) {
+      colorPalette = ['#2C3E50', '#34495E', '#7F8C8D', '#E67E22']; // 산업용 색상
+      colorReason = '산업용 제품에 적합한 안전하고 전문적인 색상';
+    } else if (productPurpose.includes('의료') || productPurpose.includes('헬스케어')) {
+      colorPalette = ['#ECF0F1', '#BDC3C7', '#3498DB', '#27AE60']; // 의료용 색상
+      colorReason = '의료용 제품의 청결함과 신뢰성을 표현하는 색상';
+    } else if (productPurpose.includes('전자') || productPurpose.includes('IT')) {
+      colorPalette = ['#2C3E50', '#9B59B6', '#3498DB', '#95A5A6']; // 전자제품 색상
+      colorReason = '전자제품의 첨단 기술감을 강조하는 색상';
+    } else {
+      // 기본 전문적 색상
+      colorPalette = ['#2C3E50', '#34495E', '#7F8C8D', '#95A5A6', '#BDC3C7', '#ECF0F1', '#E74C3C', '#3498DB'];
+      colorReason = '전문적이고 실용적인 범용 색상';
+    }
+    
+    const randomColor = colorPalette[Math.floor(Math.random() * colorPalette.length)];
     
     updateMaterialColorSet(setId, { 
       color: randomColor,
       enabled: true 
     });
     
-    alert(`🎨 AI 추천 색상: ${randomColor}\n\n전문적이고 실용적인 색상으로 제품의 기능성을 강조합니다.`);
+    alert(`🎨 AI 추천 색상: ${randomColor}\n\n${productName} 설계도 구현을 위한 ${colorReason}입니다. ${productTarget}의 ${productPurpose} 요구사항에 최적화되었습니다.`);
   };
 
   const handleAIRecommendFinish = async () => {
-    const functionalFinishes = ['Matte', 'Brushed', 'Textured'];
-    const randomFinish = functionalFinishes[Math.floor(Math.random() * functionalFinishes.length)];
+    if (!productName || !productPurpose || !productTarget) {
+      alert('제품 정보를 모두 입력해주세요 (제품명, 용도, 타겟 사용자)');
+      return;
+    }
+
+    // 설계도 기반 제품의 마감 추천
+    let recommendedFinish = '';
+    let finishReason = '';
     
-    setFinish(randomFinish);
+    if (productPurpose.includes('산업') || productPurpose.includes('공업')) {
+      recommendedFinish = 'Textured';
+      finishReason = '산업용 제품의 안전한 그립감과 내구성을 위한 텍스처 마감';
+    } else if (productPurpose.includes('정밀') || productPurpose.includes('의료')) {
+      recommendedFinish = 'Satin';
+      finishReason = '정밀 제품의 청결함과 전문성을 표현하는 새틴 마감';
+    } else if (productPurpose.includes('전자') || productPurpose.includes('IT')) {
+      recommendedFinish = 'Brushed';
+      finishReason = '전자제품의 첨단 기술감을 강조하는 브러시 마감';
+    } else if (productPurpose.includes('구조') || productPurpose.includes('프레임')) {
+      recommendedFinish = 'Matte';
+      finishReason = '구조물의 실용성과 견고함을 표현하는 무광 마감';
+    } else {
+      const functionalFinishes = ['Matte', 'Brushed', 'Textured'];
+      recommendedFinish = functionalFinishes[Math.floor(Math.random() * functionalFinishes.length)];
+      finishReason = '설계도 기반 제품에 적합한 기능적 마감';
+    }
+    
+    setFinish(recommendedFinish);
     setFinishEnabled(true);
     
-    alert(`🎨 AI 추천 마감: ${randomFinish}\n\n설계도 기반 제품에 적합한 기능적 마감으로 내구성과 실용성을 제공합니다.`);
+    alert(`🎨 AI 추천 마감: ${recommendedFinish}\n\n${productName} 설계도 구현을 위한 ${finishReason}입니다. ${productTarget}의 ${productPurpose} 요구사항에 최적화되었습니다.`);
   };
 
   const handleGenerate = useCallback(async () => {
@@ -209,6 +274,9 @@ export const BlueprintToCMF: React.FC<BlueprintToCMFProps> = ({ onNavigateHome }
     setFinish(FINISHES[0]);
     setDescription('');
     setImageDescription('');
+    setProductName('');
+    setProductPurpose('');
+    setProductTarget('');
     setFinishEnabled(false);
     setDescriptionEnabled(false);
   };
@@ -248,6 +316,12 @@ export const BlueprintToCMF: React.FC<BlueprintToCMFProps> = ({ onNavigateHome }
             previewUrls={originalImages.map(img => img.previewUrl)}
             imageDescription={imageDescription}
             onImageDescriptionChange={setImageDescription}
+            productName={productName}
+            onProductNameChange={setProductName}
+            productPurpose={productPurpose}
+            onProductPurposeChange={setProductPurpose}
+            productTarget={productTarget}
+            onProductTargetChange={setProductTarget}
           />
         </div>
       </div>

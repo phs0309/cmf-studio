@@ -9,9 +9,28 @@ interface ImageUploaderProps {
   previewUrls: (string | null)[];
   imageDescription: string;
   onImageDescriptionChange: (description: string) => void;
+  productName: string;
+  onProductNameChange: (name: string) => void;
+  productPurpose: string;
+  onProductPurposeChange: (purpose: string) => void;
+  productTarget: string;
+  onProductTargetChange: (target: string) => void;
 }
 
-export const ImageUploader: React.FC<ImageUploaderProps> = ({ onImagesUpload, onExampleImageSelect, onImageRemove, previewUrls, imageDescription, onImageDescriptionChange }) => {
+export const ImageUploader: React.FC<ImageUploaderProps> = ({ 
+  onImagesUpload, 
+  onExampleImageSelect, 
+  onImageRemove, 
+  previewUrls, 
+  imageDescription, 
+  onImageDescriptionChange,
+  productName,
+  onProductNameChange,
+  productPurpose,
+  onProductPurposeChange,
+  productTarget,
+  onProductTargetChange
+}) => {
   const [isDragging, setIsDragging] = useState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -97,19 +116,69 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({ onImagesUpload, on
         <input id="dropzone-file" type="file" className="hidden" onChange={handleFileChange} accept="image/png, image/jpeg, image/webp" multiple />
       </label>
       
-      {/* Image Description Input */}
-      <div className="space-y-2">
-        <label htmlFor="image-description" className="block text-sm font-medium text-gray-700">
-          이미지 설명 (선택사항)
-        </label>
-        <textarea
-          id="image-description"
-          value={imageDescription}
-          onChange={(e) => onImageDescriptionChange(e.target.value)}
-          placeholder="제품에 대한 설명을 입력해주세요 (예: 스마트폰 케이스, 무선 이어폰 등)"
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none text-sm"
-          rows={3}
-        />
+      {/* Product Information Section */}
+      <div className="bg-gray-50 rounded-xl p-6 space-y-4">
+        <h3 className="text-lg font-semibold text-gray-800 mb-4">제품 정보</h3>
+        
+        {/* Product Name */}
+        <div className="space-y-2">
+          <label htmlFor="product-name" className="block text-sm font-medium text-gray-700">
+            제품명 <span className="text-red-500">*</span>
+          </label>
+          <input
+            id="product-name"
+            type="text"
+            value={productName}
+            onChange={(e) => onProductNameChange(e.target.value)}
+            placeholder="예: iPhone 15 케이스, 무선 이어폰, 노트북"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm"
+          />
+        </div>
+
+        {/* Product Purpose */}
+        <div className="space-y-2">
+          <label htmlFor="product-purpose" className="block text-sm font-medium text-gray-700">
+            용도/목적 <span className="text-red-500">*</span>
+          </label>
+          <input
+            id="product-purpose"
+            type="text"
+            value={productPurpose}
+            onChange={(e) => onProductPurposeChange(e.target.value)}
+            placeholder="예: 휴대폰 보호, 음악 감상, 업무용, 게임용"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm"
+          />
+        </div>
+
+        {/* Target User */}
+        <div className="space-y-2">
+          <label htmlFor="product-target" className="block text-sm font-medium text-gray-700">
+            타겟 사용자 <span className="text-red-500">*</span>
+          </label>
+          <input
+            id="product-target"
+            type="text"
+            value={productTarget}
+            onChange={(e) => onProductTargetChange(e.target.value)}
+            placeholder="예: 20-30대 직장인, 학생, 게이머, 시니어"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm"
+          />
+        </div>
+
+        {/* Image Description */}
+        <div className="space-y-2">
+          <label htmlFor="image-description" className="block text-sm font-medium text-gray-700">
+            추가 설명 (선택사항)
+          </label>
+          <textarea
+            id="image-description"
+            value={imageDescription}
+            onChange={(e) => onImageDescriptionChange(e.target.value)}
+            placeholder="특별한 요구사항이나 추가 설명을 입력해주세요"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none text-sm"
+            rows={2}
+          />
+        </div>
       </div>
       
       {/* Example Images Section */}
