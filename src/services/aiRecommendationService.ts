@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from '@google/genai';
+import { GoogleGenAI } from '@google/genai';
 import { MATERIALS, FINISHES } from '../../constants';
 
 const API_KEY = import.meta.env.VITE_API_KEY || import.meta.env.API_KEY;
@@ -19,15 +19,14 @@ export const getAIRecommendation = async (
     throw new Error('API 키가 설정되지 않았습니다.');
   }
 
-  const genAI = new GoogleGenerativeAI(API_KEY);
-  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+  const ai = new GoogleGenAI({ apiKey: API_KEY });
 
   // 사용 가능한 소재와 마감 옵션 준비
   const availableMaterials = MATERIALS.map(m => m.name).join(', ');
   const availableFinishes = FINISHES.join(', ');
 
   // 프롬프트 구성
-  let prompt = `당신은 2024-2025 최신 트렌드를 반영하는 CMF(Color, Material, Finish) 디자인 전문가입니다.
+  const prompt = `당신은 2024-2025 최신 트렌드를 반영하는 CMF(Color, Material, Finish) 디자인 전문가입니다.
 
 제품 정보:
 - 제품명: ${productName}
@@ -52,28 +51,13 @@ export const getAIRecommendation = async (
 }`;
 
   try {
-    let result;
-    
-    if (imageFiles && imageFiles.length > 0) {
-      // 이미지가 있는 경우
-      const imageParts = await Promise.all(
-        imageFiles.map(async (file) => ({
-          inlineData: {
-            data: await fileToBase64(file),
-            mimeType: file.type,
-          },
-        }))
-      );
+    const response = await ai.models.generateContent({
+      model: 'gemini-1.5-flash',
+      contents: {
+        parts: [{ text: prompt }],
+      },
+    });
 
-      prompt += "\n\n업로드된 제품 이미지를 분석하여 현재 디자인을 파악하고, 더 나은 CMF를 제안해주세요.";
-      
-      result = await model.generateContent([prompt, ...imageParts]);
-    } else {
-      // 텍스트만 있는 경우
-      result = await model.generateContent(prompt);
-    }
-
-    const response = result.response;
     let text = response.text();
     
     // JSON 부분만 추출
@@ -110,17 +94,4 @@ export const getAIRecommendation = async (
       reasoning: '기본 추천입니다. 다시 시도해주세요.'
     };
   }
-};
-
-// 파일을 Base64로 변환하는 헬퍼 함수
-const fileToBase64 = (file: File): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => {
-      const result = reader.result as string;
-      resolve(result.split(',')[1]); // data:image/...;base64, 부분 제거
-    };
-    reader.onerror = error => reject(error);
-  });
 };
