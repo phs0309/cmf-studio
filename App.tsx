@@ -374,9 +374,10 @@ const App: React.FC = () => {
   return (
     <div className="min-h-screen text-gray-800 font-sans relative overflow-hidden" style={{
       backgroundImage: `url('/logos/back.png')`,
-      backgroundSize: 'cover',
+      backgroundSize: '100vw 100vh',
       backgroundPosition: 'center',
-      backgroundRepeat: 'no-repeat'
+      backgroundRepeat: 'no-repeat',
+      backgroundAttachment: 'fixed'
     }}>
       {/* Optional overlay for better text readability */}
       <div className="absolute inset-0 bg-white/10"></div>
