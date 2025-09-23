@@ -22,8 +22,21 @@ export const getAIRecommendation = async (
   productPurpose: string,
   imageFiles?: File[]
 ): Promise<AIRecommendationResult> => {
+  console.log('🔑 API Key Debug:', {
+    processEnvKey: process.env.API_KEY,
+    viteEnvKey: import.meta.env.VITE_API_KEY,
+    finalApiKey: API_KEY,
+    apiKeyLength: API_KEY?.length || 0
+  });
+  
   if (!API_KEY) {
+    console.error('❌ API Key is missing!');
     throw new Error('AI 추천 서비스에 일시적인 문제가 발생했습니다. 잠시 후 다시 시도해주세요.');
+  }
+  
+  if (API_KEY.includes('your_') || API_KEY === 'your_gemini_api_key_here') {
+    console.error('❌ API Key is placeholder value:', API_KEY);
+    throw new Error('AI 추천 서비스 설정이 완료되지 않았습니다. 관리자에게 문의해주세요.');
   }
 
   const ai = new GoogleGenAI({ apiKey: API_KEY });
