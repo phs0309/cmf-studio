@@ -155,9 +155,23 @@ const App: React.FC = () => {
       const materials = enabledSets.map(set => set.material);
       const colors = enabledSets.map(set => set.color);
       
-      const result = await generateCmfDesign(uploadedFiles, materials, colors, description);
+      // AI 추천이 있다면 추천 설명을 포함한 설명 생성
+      let fullDescription = description;
+      if (aiRecommendation?.reasoning) {
+        fullDescription = description 
+          ? `${description}\n\n[AI 추천 근거] ${aiRecommendation.reasoning}`
+          : `[AI 추천 근거] ${aiRecommendation.reasoning}`;
+      }
+      
+      const result = await generateCmfDesign(uploadedFiles, materials, colors, fullDescription);
       setGeneratedImages(result.images);
-      setDesignExplanation(result.explanation);
+      
+      // AI 추천이 있다면 추천 설명을 디자인 분석에 포함
+      let enhancedExplanation = result.explanation;
+      if (aiRecommendation?.reasoning) {
+        enhancedExplanation = `🎨 AI 추천 분석\n${aiRecommendation.reasoning}\n\n📊 디자인 생성 결과\n${result.explanation}`;
+      }
+      setDesignExplanation(enhancedExplanation);
       
     } catch (err) {
       console.error(err);
@@ -250,7 +264,8 @@ const App: React.FC = () => {
         setDescription(aiRecommendation.description);
         setDescriptionEnabled(true);
       }
-      setShowRecommendationBanner(false);
+      // 추천을 적용했지만 배너는 유지 (추천 내용을 계속 볼 수 있도록)
+      // setShowRecommendationBanner(false);
     }
   };
 

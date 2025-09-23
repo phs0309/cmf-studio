@@ -90,10 +90,11 @@ export const AIRecommendationModal: React.FC<AIRecommendationModalProps> = ({
                     <span className="font-semibold">Google Gemini AI</span>가 다음을 종합 분석하여 맞춤형 CMF 디자인을 제안합니다:
                   </p>
                   <ul className="list-disc list-inside space-y-1 ml-2 text-xs">
-                    <li><span className="font-medium">글로벌 디자인 트렌드</span> - 2024-2025 최신 색상 및 소재 동향</li>
-                    <li><span className="font-medium">타겟 사용자 분석</span> - 제품 용도에 따른 사용자 선호도</li>
-                    <li><span className="font-medium">브랜드 아이덴티티</span> - 제품 카테고리별 적합한 디자인 언어</li>
-                    <li><span className="font-medium">기능적 요소</span> - 실용성과 미학의 완벽한 조화</li>
+                    <li><span className="font-medium">글로벌 디자인 트렌드</span> - 2024-2025 최신 색상/소재 동향, 지속가능성 트렌드</li>
+                    <li><span className="font-medium">사용자 경험(UX) 분석</span> - 제품 사용 환경, 타겟 라이프스타일 반영</li>
+                    <li><span className="font-medium">심리학적 색상 효과</span> - 감정적 연결고리, 브랜드 포지셔닝 최적화</li>
+                    <li><span className="font-medium">기술적/실용적 고려</span> - 내구성, 유지보수성, 제조 효율성 분석</li>
+                    <li><span className="font-medium">촉각적 경험</span> - 마감 처리에 따른 사용자 감성 경험</li>
                   </ul>
                   <p className="text-xs mt-3 bg-white/70 p-2 rounded border-l-3 border-purple-300">
                     💡 <span className="font-medium">전문 디자이너 수준의 근거 기반 추천</span>을 받아보세요
@@ -124,13 +125,19 @@ export const AIRecommendationModal: React.FC<AIRecommendationModalProps> = ({
               <label htmlFor="productIntent" className="block text-sm font-medium text-gray-700 mb-2">
                 제품의 용도 및 의도 *
               </label>
+              <div className="mb-2 text-xs text-gray-600 bg-gray-50 p-2 rounded">
+                💡 <span className="font-medium">구체적으로 작성할수록 정확한 추천을 받을 수 있습니다:</span>
+                <br />• 타겟 사용자 (연령, 직업, 라이프스타일)
+                <br />• 사용 환경 (실내/실외, 업무/개인)
+                <br />• 추구하는 가치 (친환경, 프리미엄, 실용성 등)
+              </div>
               <textarea
                 id="productIntent"
                 value={productIntent}
                 onChange={(e) => setProductIntent(e.target.value)}
-                placeholder="예: 젊은 직장인을 위한 세련된 업무용 액세서리, 가정용 친환경 가구 등"
+                placeholder="예: 20-30대 직장인을 위한 프리미엄 업무용 액세서리로, 모던한 사무 환경에서 사용하며 세련되고 전문적인 이미지를 추구합니다."
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
-                rows={3}
+                rows={4}
                 required
               />
             </div>
