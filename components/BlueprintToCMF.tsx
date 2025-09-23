@@ -237,7 +237,7 @@ export const BlueprintToCMF: React.FC<BlueprintToCMFProps> = ({ onNavigateHome }
       const colors = enabledSets.map(set => set.color);
       
       // Enhanced prompt for blueprint to CMF conversion
-      const blueprintDescription = `Convert this blueprint/technical drawing into a realistic product visualization. Apply the specified materials and colors to create a professional product rendering. ${description}`;
+      const blueprintDescription = `Convert this blueprint/technical drawing into a realistic 3D rendered CMF design. Remove any pencil marks, sketch lines, or drawing artifacts. Create a clean, professional 3D product visualization with photorealistic materials and lighting. Apply the specified materials and colors to create a high-quality product rendering that looks like a finished consumer product. ${description}`;
       
       const result = await generateCmfDesign(uploadedFiles, materials, colors, blueprintDescription);
       setGeneratedImages(result.images);
@@ -296,7 +296,7 @@ export const BlueprintToCMF: React.FC<BlueprintToCMFProps> = ({ onNavigateHome }
           홈으로 돌아가기
         </button>
         
-        <h1 className="text-3xl font-bold text-gray-900">설계도를 CMF로</h1>
+        <h1 className="text-3xl font-bold text-gray-900">설계도를 CMF Design으로</h1>
         <p className="text-lg text-gray-600 max-w-2xl mx-auto">
           기술 도면이나 설계도를 실제 제품 비주얼로 변환하고<br />
           원하는 색상, 소재, 마감을 적용해보세요

@@ -69,7 +69,7 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
                     onClick={() => handleCreateClick('cmf-editor')}
                     className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                   >
-                    <div className="font-medium">CMF 수정</div>
+                    <div className="font-medium">CMF Design 수정</div>
                     <div className="text-xs text-gray-500 mt-1">기존 제품의 색상, 소재, 마감 수정</div>
                   </button>
                   <button
