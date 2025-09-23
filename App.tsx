@@ -223,8 +223,9 @@ const App: React.FC = () => {
     setFinish(FINISHES[0]);
     setDescription('');
     setImageDescription('');
-    setProductName('');
-    setProductPurpose('');
+    // 제품 정보는 유지
+    // setProductName('');
+    // setProductPurpose('');
     setFinishEnabled(false);
     setDescriptionEnabled(false);
     setAiRecommendation(null);
