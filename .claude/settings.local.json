@@ -18,7 +18,8 @@
       "Bash(mkdir:*)",
       "WebFetch(domain:designs.ai)",
       "Bash(git rm:*)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(rm:*)"
     ],
     "deny": [],
     "ask": []

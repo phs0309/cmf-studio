@@ -415,6 +415,9 @@ const App: React.FC = () => {
                 <video
                   className="w-full rounded-2xl shadow-2xl"
                   controls
+                  autoPlay
+                  muted
+                  loop
                   playsInline
                   preload="metadata"
                 >
