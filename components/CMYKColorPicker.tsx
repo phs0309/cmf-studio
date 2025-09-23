@@ -14,21 +14,6 @@ interface CMYKValues {
   k: number; // Key/Black (0-100)
 }
 
-// 인기 색상 팔레트 프리셋
-const COLOR_PRESETS = [
-  { name: '애플 블루', hex: '#007AFF', cmyk: { c: 100, m: 50, y: 0, k: 0 } },
-  { name: '레드', hex: '#FF3B30', cmyk: { c: 0, m: 90, y: 85, k: 0 } },
-  { name: '오렌지', hex: '#FF9500', cmyk: { c: 0, m: 50, y: 100, k: 0 } },
-  { name: '옐로우', hex: '#FFCC00', cmyk: { c: 0, m: 20, y: 100, k: 0 } },
-  { name: '그린', hex: '#34C759', cmyk: { c: 70, m: 0, y: 100, k: 0 } },
-  { name: '민트', hex: '#5AC8FA', cmyk: { c: 65, m: 0, y: 10, k: 0 } },
-  { name: '퍼플', hex: '#AF52DE', cmyk: { c: 50, m: 70, y: 0, k: 0 } },
-  { name: '핑크', hex: '#FF2D92', cmyk: { c: 0, m: 85, y: 30, k: 0 } },
-  { name: '다크 그레이', hex: '#8E8E93', cmyk: { c: 0, m: 0, y: 0, k: 45 } },
-  { name: '블랙', hex: '#000000', cmyk: { c: 0, m: 0, y: 0, k: 100 } },
-  { name: '화이트', hex: '#FFFFFF', cmyk: { c: 0, m: 0, y: 0, k: 0 } },
-  { name: '네이비', hex: '#1D1D1F', cmyk: { c: 100, m: 85, y: 25, k: 10 } },
-];
 
 export const CMYKColorPicker: React.FC<CMYKColorPickerProps> = ({
   value,
@@ -93,11 +78,6 @@ export const CMYKColorPicker: React.FC<CMYKColorPickerProps> = ({
     onChange(cmykToHex(newCmyk));
   };
 
-  // Handle color preset selection
-  const handlePresetSelect = (preset: typeof COLOR_PRESETS[0]) => {
-    setCmyk(preset.cmyk);
-    onChange(preset.hex);
-  };
 
   return (
     <div className="space-y-3">
@@ -110,7 +90,7 @@ export const CMYKColorPicker: React.FC<CMYKColorPickerProps> = ({
             value={value}
             onChange={(e) => onChange(e.target.value)}
             disabled={disabled}
-            className={`w-16 h-16 rounded-full border-3 border-white shadow-lg cursor-pointer transition-all duration-200 hover:scale-105 disabled:cursor-not-allowed disabled:opacity-50 ${
+            className={`w-24 h-16 rounded-2xl border-3 border-white shadow-lg cursor-pointer transition-all duration-200 hover:scale-105 disabled:cursor-not-allowed disabled:opacity-50 ${
               disabled ? 'filter grayscale' : ''
             }`}
             style={{
@@ -158,27 +138,6 @@ export const CMYKColorPicker: React.FC<CMYKColorPickerProps> = ({
         </div>
       )}
 
-      {/* Compact Color Palette Presets */}
-      <div>
-        <div className="text-xs font-medium text-gray-700 mb-2">색상 팔레트</div>
-        <div className="grid grid-cols-12 gap-0.5">
-          {COLOR_PRESETS.map((preset) => (
-            <button
-              key={preset.name}
-              type="button"
-              onClick={() => !disabled && handlePresetSelect(preset)}
-              disabled={disabled}
-              className={`w-5 h-5 rounded border transition-all duration-200 hover:scale-110 disabled:cursor-not-allowed disabled:opacity-50 ${
-                value.toUpperCase() === preset.hex.toUpperCase()
-                  ? 'border-purple-500 ring-1 ring-purple-300'
-                  : 'border-gray-200 hover:border-purple-300'
-              }`}
-              style={{ backgroundColor: preset.hex }}
-              title={preset.name}
-            />
-          ))}
-        </div>
-      </div>
 
       {/* Color Code Input */}
       <div className="bg-gray-50 p-3 rounded-lg">
