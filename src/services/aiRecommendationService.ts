@@ -71,19 +71,17 @@ export const getAIRecommendation = async (
 }`;
 
   try {
-    const model = ai.getGenerativeModel({ model: 'gemini-1.5-flash' });
-    const response = await model.generateContent(prompt);
+    const response = await ai.models.generateContent({
+      model: 'gemini-1.5-flash',
+      contents: {
+        parts: [{ text: prompt }],
+      },
+    });
+
+    const text = response.candidates?.[0]?.content?.parts?.[0]?.text;
     
-    console.log('🔍 Full API Response:', response);
-    
-    let text;
-    if (response.response && typeof response.response.text === 'function') {
-      text = response.response.text();
-    } else if (response.candidates && response.candidates[0] && response.candidates[0].content) {
-      text = response.candidates[0].content.parts[0].text;
-    } else {
-      console.error('❌ Unexpected response structure:', response);
-      throw new Error('Unexpected API response structure');
+    if (!text) {
+      throw new Error('AI 응답을 받을 수 없습니다.');
     }
     
     console.log('📝 Generated text:', text);
