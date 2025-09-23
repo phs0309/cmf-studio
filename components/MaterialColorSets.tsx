@@ -99,7 +99,7 @@ export const MaterialColorSets: React.FC<MaterialColorSetsProps> = ({
                           <img
                             src={material.thumbnail}
                             alt={material.name}
-                            className="w-8 h-8 rounded object-cover border border-gray-200"
+                            className="w-8 h-8 rounded object-cover"
                           />
                           <div className="flex-1 min-w-0">
                             <h3 className={`text-xs font-medium truncate ${
