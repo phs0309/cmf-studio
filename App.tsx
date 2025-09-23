@@ -413,9 +413,30 @@ const App: React.FC = () => {
             <div className="pt-8">
               <div className="max-w-3xl mx-auto mb-8">
                 <video
+                  ref={(video) => {
+                    if (video) {
+                      const playVideo = () => {
+                        video.play().catch(() => {
+                          // 자동재생 실패시 무시
+                        });
+                      };
+                      
+                      // 사용자 상호작용 후 재생 시도
+                      const enableAutoplay = () => {
+                        playVideo();
+                        document.removeEventListener('click', enableAutoplay);
+                        document.removeEventListener('touchstart', enableAutoplay);
+                      };
+                      
+                      document.addEventListener('click', enableAutoplay);
+                      document.addEventListener('touchstart', enableAutoplay);
+                      
+                      // 즉시 재생 시도 (일부 브라우저에서 작동)
+                      playVideo();
+                    }
+                  }}
                   className="w-full rounded-2xl shadow-2xl"
                   controls
-                  autoPlay
                   muted
                   loop
                   playsInline
