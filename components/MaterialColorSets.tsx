@@ -9,6 +9,7 @@ interface MaterialColorSetsProps {
   onAddSet: () => void;
   onRemoveSet: (id: string) => void;
   onUpdateSet: (id: string, updates: Partial<MaterialColorSet>) => void;
+  recentColors?: string[];
 }
 
 export const MaterialColorSets: React.FC<MaterialColorSetsProps> = ({
@@ -16,6 +17,7 @@ export const MaterialColorSets: React.FC<MaterialColorSetsProps> = ({
   onAddSet,
   onRemoveSet,
   onUpdateSet,
+  recentColors = [],
 }) => {
   return (
     <div className="space-y-6">
@@ -122,6 +124,7 @@ export const MaterialColorSets: React.FC<MaterialColorSetsProps> = ({
                   value={set.color}
                   onChange={(color) => onUpdateSet(set.id, { color })}
                   disabled={!set.enabled}
+                  recentColors={recentColors}
                 />
               </div>
             </div>

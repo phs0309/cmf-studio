@@ -22,6 +22,7 @@ interface ControlsProps {
   setDescriptionEnabled: (enabled: boolean) => void;
   onAIRecommendation?: () => void;
   isAIRecommending?: boolean;
+  recentColors?: string[];
 }
 
 export const Controls: React.FC<ControlsProps> = ({
@@ -43,6 +44,7 @@ export const Controls: React.FC<ControlsProps> = ({
   setDescriptionEnabled,
   onAIRecommendation,
   isAIRecommending = false,
+  recentColors = [],
 }) => {
   return (
     <div className="space-y-6">
@@ -84,6 +86,7 @@ export const Controls: React.FC<ControlsProps> = ({
         onAddSet={onAddSet}
         onRemoveSet={onRemoveSet}
         onUpdateSet={onUpdateSet}
+        recentColors={recentColors}
       />
 
       {/* 마감 섹션 */}

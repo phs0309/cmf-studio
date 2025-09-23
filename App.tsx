@@ -47,6 +47,19 @@ const App: React.FC = () => {
   const [aiRecommendation, setAiRecommendation] = useState<AIRecommendation | null>(null);
   const [showRecommendationBanner, setShowRecommendationBanner] = useState<boolean>(false);
   const [isRecommendationApplied, setIsRecommendationApplied] = useState<boolean>(false);
+  
+  // Recent colors state
+  const [recentColors, setRecentColors] = useState<string[]>([]);
+  
+  // Add color to recent colors
+  const addToRecentColors = useCallback((color: string) => {
+    setRecentColors(prev => {
+      // Remove color if it already exists
+      const filtered = prev.filter(c => c.toLowerCase() !== color.toLowerCase());
+      // Add to beginning, keep max 8 colors
+      return [color, ...filtered].slice(0, 8);
+    });
+  }, []);
 
 
   // Initialize keep-alive service
@@ -124,6 +137,11 @@ const App: React.FC = () => {
     setMaterialColorSets(materialColorSets.map(set => 
       set.id === id ? { ...set, ...updates } : set
     ));
+    
+    // Add color to recent colors if color is being updated
+    if (updates.color) {
+      addToRecentColors(updates.color);
+    }
   };
   
   useEffect(() => {
@@ -514,6 +532,7 @@ const App: React.FC = () => {
                                 setFinish={setFinish}
                                 description={description}
                                 setDescription={setDescription}
+                                recentColors={recentColors}
                                 onGenerate={handleGenerate}
                                 isLoading={isLoading}
                                 isReady={isReadyToGenerate}

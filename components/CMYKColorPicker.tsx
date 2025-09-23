@@ -4,6 +4,7 @@ interface CMYKColorPickerProps {
   value: string; // hex color
   onChange: (color: string) => void;
   disabled?: boolean;
+  recentColors?: string[];
 }
 
 interface CMYKValues {
@@ -33,6 +34,7 @@ export const CMYKColorPicker: React.FC<CMYKColorPickerProps> = ({
   value,
   onChange,
   disabled = false,
+  recentColors = [],
 }) => {
   const [cmyk, setCmyk] = useState<CMYKValues>({ c: 0, m: 0, y: 0, k: 0 });
 
@@ -132,8 +134,33 @@ export const CMYKColorPicker: React.FC<CMYKColorPickerProps> = ({
         </div>
       </div>
 
+      {/* Recent Colors */}
+      {recentColors.length > 0 && (
+        <div>
+          <div className="text-xs font-medium text-gray-700 mb-2">최근 사용한 색상</div>
+          <div className="flex gap-1 flex-wrap">
+            {recentColors.map((color, index) => (
+              <button
+                key={`${color}-${index}`}
+                type="button"
+                onClick={() => !disabled && onChange(color)}
+                disabled={disabled}
+                className={`w-6 h-6 rounded border transition-all duration-200 hover:scale-110 disabled:cursor-not-allowed disabled:opacity-50 ${
+                  value.toUpperCase() === color.toUpperCase()
+                    ? 'border-purple-500 ring-2 ring-purple-300'
+                    : 'border-gray-300 hover:border-purple-400'
+                }`}
+                style={{ backgroundColor: color }}
+                title={color}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Compact Color Palette Presets */}
       <div>
+        <div className="text-xs font-medium text-gray-700 mb-2">색상 팔레트</div>
         <div className="grid grid-cols-12 gap-0.5">
           {COLOR_PRESETS.map((preset) => (
             <button
