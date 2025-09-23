@@ -38,8 +38,9 @@ export const startKeepAlive = () => {
 
 // Start keep alive only in production
 export const initKeepAlive = () => {
-  if (import.meta.env.PROD) {
-    return startKeepAlive();
-  }
+  // Temporarily disabled - backend server not deployed
+  // if (import.meta.env.PROD) {
+  //   return startKeepAlive();
+  // }
   return () => {}; // No-op cleanup function for development
 };
