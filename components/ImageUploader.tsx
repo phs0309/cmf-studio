@@ -1,10 +1,8 @@
 import React, { useCallback, useState } from 'react';
 import { UploadIcon } from './icons/UploadIcon';
-import { ExampleImages } from './ExampleImages';
 
 interface ImageUploaderProps {
   onImagesUpload: (files: File[]) => void;
-  onExampleImageSelect: (imagePath: string) => void;
   onImageRemove?: (index: number) => void;
   previewUrls: (string | null)[];
   imageDescription: string;
@@ -17,7 +15,6 @@ interface ImageUploaderProps {
 
 export const ImageUploader: React.FC<ImageUploaderProps> = ({ 
   onImagesUpload, 
-  onExampleImageSelect, 
   onImageRemove, 
   previewUrls, 
   imageDescription, 
@@ -162,9 +159,6 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
           />
         </div>
       </div>
-      
-      {/* Example Images Section */}
-      <ExampleImages onImageSelect={onExampleImageSelect} />
     </div>
   );
 };
