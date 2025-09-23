@@ -6,6 +6,7 @@ import { ResultDisplay } from './components/ResultDisplay';
 import { Loader } from './components/Loader';
 import { AIRecommendationModal, AIRecommendation } from './components/AIRecommendationModal';
 import { BlueprintToCMF } from './components/BlueprintToCMF';
+import { Tutorial } from './components/Tutorial';
 import { generateCmfDesign } from './services/geminiService';
 import { getAIRecommendation } from './src/services/aiRecommendationService';
 import { MATERIALS, MATERIAL_NAMES, FINISHES, MaterialColorSet } from './constants';
@@ -50,6 +51,9 @@ const App: React.FC = () => {
   
   // Recent colors state
   const [recentColors, setRecentColors] = useState<string[]>([]);
+  
+  // Tutorial state
+  const [isTutorialOpen, setIsTutorialOpen] = useState<boolean>(false);
   
   // Add color to recent colors
   const addToRecentColors = useCallback((color: string) => {
@@ -356,6 +360,20 @@ const App: React.FC = () => {
     setDesignerStep(1);
   };
 
+  // Tutorial handlers
+  const handleTutorialOpen = () => {
+    setIsTutorialOpen(true);
+  };
+
+  const handleTutorialClose = () => {
+    setIsTutorialOpen(false);
+  };
+
+  const handleTutorialStart = () => {
+    setCurrentPage('cmf-editor');
+    setDesignerStep(2);
+  };
+
   return (
     <div className="min-h-screen text-gray-800 font-sans relative overflow-hidden" style={{
       backgroundImage: `url('/logos/back.png')`,
@@ -366,7 +384,7 @@ const App: React.FC = () => {
     }}>
       {/* Optional overlay for better text readability */}
       <div className="absolute inset-0 bg-white/10"></div>
-      <Header onNavigate={handleNavigate} />
+      <Header onNavigate={handleNavigate} onTutorial={handleTutorialOpen} />
       <main className="container mx-auto px-4 pt-32 pb-20 relative z-10">
         
         {/* Render different pages based on currentPage */}
@@ -643,6 +661,13 @@ const App: React.FC = () => {
             isOpen={isAIModalOpen}
             onClose={() => setIsAIModalOpen(false)}
             onRecommendation={handleAIRecommendationModal}
+        />
+
+        {/* 튜토리얼 모달 */}
+        <Tutorial
+            isOpen={isTutorialOpen}
+            onClose={handleTutorialClose}
+            onStart={handleTutorialStart}
         />
 
       </main>

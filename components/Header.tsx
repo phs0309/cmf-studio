@@ -2,9 +2,10 @@ import React, { useState, useRef, useEffect } from 'react';
 
 interface HeaderProps {
   onNavigate?: (page: 'home' | 'cmf-editor' | 'blueprint-to-cmf') => void;
+  onTutorial?: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
+export const Header: React.FC<HeaderProps> = ({ onNavigate, onTutorial }) => {
   const [isCreateDropdownOpen, setIsCreateDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -83,7 +84,12 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
               )}
             </div>
             
-            <a href="#" className="text-indigo-900 hover:text-indigo-700 font-bold transition-colors">Tutorial</a>
+            <button 
+              onClick={onTutorial}
+              className="text-indigo-900 hover:text-indigo-700 font-bold transition-colors"
+            >
+              Tutorial
+            </button>
             <a href="#" className="text-indigo-900 hover:text-indigo-700 font-bold transition-colors">Library</a>
             <a href="#" className="text-indigo-900 hover:text-indigo-700 font-bold transition-colors">Price</a>
           </nav>
