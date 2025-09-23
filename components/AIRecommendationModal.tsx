@@ -84,21 +84,21 @@ export const AIRecommendationModal: React.FC<AIRecommendationModalProps> = ({
                 </svg>
               </div>
               <div className="flex-1">
-                <h3 className="text-sm font-bold text-purple-900 mb-2">🎨 AI 디자인 컨설턴트</h3>
-                <div className="space-y-2 text-sm text-purple-800">
-                  <p>
-                    <span className="font-semibold">Google Gemini AI</span>가 다음을 종합 분석하여 맞춤형 CMF 디자인을 제안합니다:
+                <h3 className="text-base font-bold text-purple-900 mb-3">🎨 AI 디자인 컨설턴트</h3>
+                <div className="space-y-3 text-base text-purple-800">
+                  <p className="font-semibold">
+                    Google Gemini AI 맞춤형 CMF 디자인 분석
                   </p>
-                  <ul className="list-disc list-inside space-y-1 ml-2 text-xs">
-                    <li><span className="font-medium">글로벌 디자인 트렌드</span> - 2024-2025 최신 색상/소재 동향, 지속가능성 트렌드</li>
-                    <li><span className="font-medium">사용자 경험(UX) 분석</span> - 제품 사용 환경, 타겟 라이프스타일 반영</li>
-                    <li><span className="font-medium">심리학적 색상 효과</span> - 감정적 연결고리, 브랜드 포지셔닝 최적화</li>
-                    <li><span className="font-medium">기술적/실용적 고려</span> - 내구성, 유지보수성, 제조 효율성 분석</li>
-                    <li><span className="font-medium">촉각적 경험</span> - 마감 처리에 따른 사용자 감성 경험</li>
-                  </ul>
-                  <p className="text-xs mt-3 bg-white/70 p-2 rounded border-l-3 border-purple-300">
-                    💡 <span className="font-medium">전문 디자이너 수준의 근거 기반 추천</span>을 받아보세요
-                  </p>
+                  <div className="space-y-2 text-sm leading-relaxed">
+                    <div>• <span className="font-medium">2024-2025 글로벌 트렌드</span></div>
+                    <div>• <span className="font-medium">타겟 사용자 & UX 최적화</span></div>
+                    <div>• <span className="font-medium">색상 심리학 & 브랜딩</span></div>
+                    <div>• <span className="font-medium">소재 내구성 & 실용성</span></div>
+                    <div>• <span className="font-medium">촉각 경험 & 감성 디자인</span></div>
+                  </div>
+                  <div className="text-sm mt-4 bg-white/80 p-3 rounded-lg border-l-4 border-purple-400">
+                    <span className="font-semibold text-purple-900">💡 전문가 수준의 근거 기반 추천</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -125,11 +125,13 @@ export const AIRecommendationModal: React.FC<AIRecommendationModalProps> = ({
               <label htmlFor="productIntent" className="block text-sm font-medium text-gray-700 mb-2">
                 제품의 용도 및 의도 *
               </label>
-              <div className="mb-2 text-xs text-gray-600 bg-gray-50 p-2 rounded">
-                💡 <span className="font-medium">구체적으로 작성할수록 정확한 추천을 받을 수 있습니다:</span>
-                <br />• 타겟 사용자 (연령, 직업, 라이프스타일)
-                <br />• 사용 환경 (실내/실외, 업무/개인)
-                <br />• 추구하는 가치 (친환경, 프리미엄, 실용성 등)
+              <div className="mb-3 text-sm text-gray-700 bg-gray-50 p-3 rounded-lg">
+                <div className="font-medium mb-2">💡 정확한 추천을 위한 입력 가이드</div>
+                <div className="space-y-1 text-sm leading-relaxed">
+                  <div>• 타겟 사용자 (연령, 직업, 라이프스타일)</div>
+                  <div>• 사용 환경 (실내/실외, 업무/개인)</div>
+                  <div>• 추구하는 가치 (친환경, 프리미엄, 실용성)</div>
+                </div>
               </div>
               <textarea
                 id="productIntent"
