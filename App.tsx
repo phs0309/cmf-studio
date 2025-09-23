@@ -46,6 +46,7 @@ const App: React.FC = () => {
   const [isAIModalOpen, setIsAIModalOpen] = useState<boolean>(false);
   const [aiRecommendation, setAiRecommendation] = useState<AIRecommendation | null>(null);
   const [showRecommendationBanner, setShowRecommendationBanner] = useState<boolean>(false);
+  const [isRecommendationApplied, setIsRecommendationApplied] = useState<boolean>(false);
 
 
   // Initialize keep-alive service
@@ -210,6 +211,7 @@ const App: React.FC = () => {
     setDescriptionEnabled(false);
     setAiRecommendation(null);
     setShowRecommendationBanner(false);
+    setIsRecommendationApplied(false);
     setDesignerStep(1);
   };
 
@@ -217,6 +219,7 @@ const App: React.FC = () => {
   const handleAIRecommendationModal = (recommendation: AIRecommendation) => {
     setAiRecommendation(recommendation);
     setShowRecommendationBanner(true);
+    setIsRecommendationApplied(false); // 새로운 추천 받으면 적용 상태 초기화
     
     // AI 추천에 따라 첫 번째 세트 업데이트
     if (recommendation.material && MATERIAL_NAMES.includes(recommendation.material)) {
@@ -264,6 +267,8 @@ const App: React.FC = () => {
         setDescription(aiRecommendation.description);
         setDescriptionEnabled(true);
       }
+      // 추천 적용 완료 상태 설정
+      setIsRecommendationApplied(true);
       // 추천을 적용했지만 배너는 유지 (추천 내용을 계속 볼 수 있도록)
       // setShowRecommendationBanner(false);
     }
@@ -315,6 +320,7 @@ const App: React.FC = () => {
         reasoning: recommendation.reasoning
       });
       setShowRecommendationBanner(true);
+      setIsRecommendationApplied(false); // 새로운 추천 받으면 적용 상태 초기화
 
     } catch (error) {
       console.error('AI 추천 오류:', error);
@@ -470,12 +476,17 @@ const App: React.FC = () => {
                             <div className="flex gap-3">
                                 <button
                                     onClick={applyAIRecommendation}
-                                    className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium"
+                                    disabled={isRecommendationApplied}
+                                    className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors text-sm font-medium ${
+                                        isRecommendationApplied
+                                            ? 'bg-green-600 text-white cursor-default'
+                                            : 'bg-purple-600 text-white hover:bg-purple-700'
+                                    }`}
                                 >
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                     </svg>
-                                    추천 적용하기
+                                    {isRecommendationApplied ? '적용됨' : '추천 적용하기'}
                                 </button>
                                 <button
                                     onClick={dismissAIRecommendation}
