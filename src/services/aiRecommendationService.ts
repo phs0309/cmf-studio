@@ -1,7 +1,14 @@
 import { GoogleGenAI } from '@google/genai';
 import { MATERIALS, FINISHES } from '../../constants';
 
-const API_KEY = import.meta.env.VITE_API_KEY || import.meta.env.API_KEY;
+const API_KEY = (process.env.API_KEY as string) || import.meta.env.VITE_API_KEY;
+
+// Debug logging
+console.log('API_KEY check:', {
+  processEnvKey: process.env.API_KEY ? 'exists' : 'missing',
+  viteEnvKey: import.meta.env.VITE_API_KEY ? 'exists' : 'missing',
+  finalKey: API_KEY ? 'exists' : 'missing'
+});
 
 interface AIRecommendationResult {
   material: string;
