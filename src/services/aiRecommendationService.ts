@@ -71,14 +71,22 @@ export const getAIRecommendation = async (
 }`;
 
   try {
-    const response = await ai.models.generateContent({
-      model: 'gemini-1.5-flash',
-      contents: {
-        parts: [{ text: prompt }],
-      },
-    });
-
-    let text = response.text();
+    const model = ai.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const response = await model.generateContent(prompt);
+    
+    console.log('🔍 Full API Response:', response);
+    
+    let text;
+    if (response.response && typeof response.response.text === 'function') {
+      text = response.response.text();
+    } else if (response.candidates && response.candidates[0] && response.candidates[0].content) {
+      text = response.candidates[0].content.parts[0].text;
+    } else {
+      console.error('❌ Unexpected response structure:', response);
+      throw new Error('Unexpected API response structure');
+    }
+    
+    console.log('📝 Generated text:', text);
     
     // JSON 부분만 추출
     const jsonMatch = text.match(/\{[\s\S]*\}/);
