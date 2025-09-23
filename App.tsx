@@ -391,8 +391,23 @@ const App: React.FC = () => {
               </p>
             </div>
 
-            {/* CTA Section */}
+            {/* Intro Video Section */}
             <div className="pt-8">
+              <div className="max-w-3xl mx-auto mb-8">
+                <video
+                  className="w-full rounded-2xl shadow-2xl"
+                  controls
+                  playsInline
+                  preload="metadata"
+                >
+                  <source src="/logos/intro.mp4" type="video/mp4" />
+                  브라우저가 비디오를 지원하지 않습니다.
+                </video>
+              </div>
+            </div>
+
+            {/* CTA Section */}
+            <div className="pt-4">
               <button
                 onClick={() => handleNavigate('cmf-editor')}
                 className="inline-flex items-center justify-center gap-3 text-white text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 focus:ring-4 focus:ring-purple-200 rounded-2xl px-12 py-4 transition-all duration-200 shadow-2xl hover:shadow-3xl hover:scale-105 transform"
