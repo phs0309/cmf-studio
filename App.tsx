@@ -456,41 +456,45 @@ const App: React.FC = () => {
 
                     {/* AI 추천 배너 */}
                     {showRecommendationBanner && aiRecommendation && (
-                        <div className="space-y-4 bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 p-6 rounded-2xl shadow-lg">
-                            <div className="flex items-start justify-between">
-                                <div className="flex-1">
-                                    <h3 className="text-lg font-semibold text-purple-900 mb-2">🎨 AI 디자인 추천</h3>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                                        <div>
-                                            <span className="font-medium text-purple-800">추천 소재:</span>
-                                            <span className="ml-2 text-purple-700">{aiRecommendation.material}</span>
-                                        </div>
-                                        <div>
-                                            <span className="font-medium text-purple-800">추천 색상:</span>
-                                            <span className="ml-2 inline-flex items-center gap-2 text-purple-700">
-                                                <span className="w-4 h-4 rounded border border-gray-300" style={{backgroundColor: aiRecommendation.color}}></span>
-                                                {aiRecommendation.color}
-                                            </span>
-                                        </div>
-                                        <div>
-                                            <span className="font-medium text-purple-800">추천 마감:</span>
-                                            <span className="ml-2 text-purple-700">{aiRecommendation.finish}</span>
-                                        </div>
-                                        <div>
-                                            <span className="font-medium text-purple-800">설명:</span>
-                                            <span className="ml-2 text-purple-700">{aiRecommendation.description}</span>
-                                        </div>
-                                    </div>
-                                    <p className="text-xs text-purple-600 mt-3 italic">{aiRecommendation.reasoning}</p>
-                                </div>
+                        <div className="space-y-6 bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 p-6 rounded-2xl shadow-lg">
+                            {/* 제목과 닫기 버튼 */}
+                            <div className="flex items-center justify-between">
+                                <h3 className="text-xl font-bold text-purple-900">🎨 AI 디자인 추천</h3>
                                 <button
                                     onClick={dismissAIRecommendation}
-                                    className="text-purple-400 hover:text-purple-600 ml-4"
+                                    className="text-purple-400 hover:text-purple-600 transition-colors"
                                 >
                                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                                     </svg>
                                 </button>
+                            </div>
+
+                            {/* 추천 정보 그리드 */}
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div className="bg-white/60 p-4 rounded-xl">
+                                    <div className="text-sm font-semibold text-purple-800 mb-2">추천 소재</div>
+                                    <div className="text-base font-medium text-purple-900">{aiRecommendation.material}</div>
+                                </div>
+                                <div className="bg-white/60 p-4 rounded-xl">
+                                    <div className="text-sm font-semibold text-purple-800 mb-2">추천 색상</div>
+                                    <div className="flex items-center gap-3">
+                                        <span className="w-6 h-6 rounded-full border-2 border-white shadow-sm" style={{backgroundColor: aiRecommendation.color}}></span>
+                                        <span className="text-base font-medium text-purple-900">{aiRecommendation.color}</span>
+                                    </div>
+                                </div>
+                                <div className="bg-white/60 p-4 rounded-xl">
+                                    <div className="text-sm font-semibold text-purple-800 mb-2">추천 마감</div>
+                                    <div className="text-base font-medium text-purple-900">{aiRecommendation.finish}</div>
+                                </div>
+                            </div>
+
+                            {/* 상세 설명 */}
+                            <div className="bg-white/70 p-5 rounded-xl">
+                                <div className="text-sm font-semibold text-purple-800 mb-3">💡 추천 근거</div>
+                                <div className="text-base text-purple-900 leading-relaxed whitespace-pre-line">
+                                    {aiRecommendation.reasoning}
+                                </div>
                             </div>
                             <div className="flex gap-3">
                                 <button
