@@ -3,8 +3,10 @@ import { ImageUploader } from './ImageUploader';
 import { Controls } from './Controls';
 import { ResultDisplay } from './ResultDisplay';
 import { Loader } from './Loader';
+import { AIRecommendationModal, AIRecommendation } from './AIRecommendationModal';
 import { generateCmfDesign } from '../services/geminiService';
-import { MATERIALS, FINISHES, MaterialColorSet } from '../constants';
+import { getAIRecommendation } from '../src/services/aiRecommendationService';
+import { MATERIALS, FINISHES, MATERIAL_NAMES, MaterialColorSet } from '../constants';
 import { ChevronLeftIcon } from './icons/ChevronLeftIcon';
 
 interface BlueprintToCMFProps {
@@ -37,6 +39,16 @@ export const BlueprintToCMF: React.FC<BlueprintToCMFProps> = ({ onNavigateHome }
   // Toggle states
   const [finishEnabled, setFinishEnabled] = useState<boolean>(false);
   const [descriptionEnabled, setDescriptionEnabled] = useState<boolean>(false);
+  
+  // AI Recommendation states
+  const [isAIRecommending, setIsAIRecommending] = useState<boolean>(false);
+  const [aiRecommendation, setAiRecommendation] = useState<AIRecommendation | null>(null);
+  const [showRecommendationBanner, setShowRecommendationBanner] = useState<boolean>(false);
+  const [isRecommendationApplied, setIsRecommendationApplied] = useState<boolean>(false);
+  const [isAIModalOpen, setIsAIModalOpen] = useState<boolean>(false);
+  
+  // Recent colors state
+  const [recentColors, setRecentColors] = useState<string[]>([]);
 
   const handleImagesUpload = (files: File[]) => {
     const newImages = [...originalImages];
@@ -106,9 +118,137 @@ export const BlueprintToCMF: React.FC<BlueprintToCMFProps> = ({ onNavigateHome }
     setMaterialColorSets(materialColorSets.map(set => 
       set.id === id ? { ...set, ...updates } : set
     ));
+    
+    // Add color to recent colors if color is being updated
+    if (updates.color) {
+      addToRecentColors(updates.color);
+    }
+  };
+  
+  // Add color to recent colors
+  const addToRecentColors = (color: string) => {
+    setRecentColors(prev => {
+      // Remove color if it already exists
+      const filtered = prev.filter(c => c.toLowerCase() !== color.toLowerCase());
+      // Add to beginning, keep max 8 colors
+      return [color, ...filtered].slice(0, 8);
+    });
   };
 
-  // AI recommendation handlers
+  // New unified AI recommendation handler
+  const handleAIRecommendation = async () => {
+    if (!productName || !productPurpose) {
+      alert('제품 정보를 모두 입력해주세요 (제품명, 타겟/목적)');
+      return;
+    }
+
+    setIsAIRecommending(true);
+    try {
+      // 업로드된 이미지 파일들 가져오기
+      const uploadedFiles = originalImages
+        .map(img => img.file)
+        .filter((file): file is File => file !== null);
+
+      const recommendation = await getAIRecommendation(
+        productName,
+        productPurpose,
+        uploadedFiles.length > 0 ? uploadedFiles : undefined
+      );
+
+      // 추천 결과 적용
+      if (materialColorSets.length > 0) {
+        updateMaterialColorSet(materialColorSets[0].id, {
+          material: recommendation.material,
+          color: recommendation.color,
+          enabled: true
+        });
+      }
+      
+      setFinish(recommendation.finish);
+      setFinishEnabled(true);
+
+      // 추천 결과 배너로 표시
+      setAiRecommendation({
+        material: recommendation.material,
+        color: recommendation.color,
+        finish: recommendation.finish,
+        description: '',
+        reasoning: recommendation.reasoning
+      });
+      setShowRecommendationBanner(true);
+      setIsRecommendationApplied(false); // 새로운 추천 받으면 적용 상태 초기화
+
+    } catch (error) {
+      console.error('AI 추천 오류:', error);
+      alert('추천 생성 중 오류가 발생했습니다. 다시 시도해주세요.');
+    } finally {
+      setIsAIRecommending(false);
+    }
+  };
+
+  // AI 추천 적용
+  const applyAIRecommendation = () => {
+    if (aiRecommendation) {
+      if (aiRecommendation.material && MATERIAL_NAMES.includes(aiRecommendation.material)) {
+        updateMaterialColorSet(materialColorSets[0].id, { 
+          material: aiRecommendation.material, 
+          enabled: true 
+        });
+      }
+      if (aiRecommendation.color) {
+        updateMaterialColorSet(materialColorSets[0].id, { 
+          color: aiRecommendation.color, 
+          enabled: true 
+        });
+      }
+      if (aiRecommendation.finish && FINISHES.includes(aiRecommendation.finish)) {
+        setFinish(aiRecommendation.finish);
+        setFinishEnabled(true);
+      }
+      if (aiRecommendation.description) {
+        setDescription(aiRecommendation.description);
+        setDescriptionEnabled(true);
+      }
+      // 추천 적용 완료 상태 설정
+      setIsRecommendationApplied(true);
+    }
+  };
+
+  // AI 추천 무시
+  const dismissAIRecommendation = () => {
+    setShowRecommendationBanner(false);
+  };
+
+  // AI 추천 결과 처리 (모달용)
+  const handleAIRecommendationModal = (recommendation: AIRecommendation) => {
+    setAiRecommendation(recommendation);
+    setShowRecommendationBanner(true);
+    setIsRecommendationApplied(false); // 새로운 추천 받으면 적용 상태 초기화
+    
+    // AI 추천에 따라 첫 번째 세트 업데이트
+    if (recommendation.material && MATERIAL_NAMES.includes(recommendation.material)) {
+      updateMaterialColorSet(materialColorSets[0].id, { 
+        material: recommendation.material, 
+        enabled: true 
+      });
+    }
+    if (recommendation.color) {
+      updateMaterialColorSet(materialColorSets[0].id, { 
+        color: recommendation.color, 
+        enabled: true 
+      });
+    }
+    if (recommendation.finish && FINISHES.includes(recommendation.finish)) {
+      setFinish(recommendation.finish);
+      setFinishEnabled(true);
+    }
+    if (recommendation.description) {
+      setDescription(recommendation.description);
+      setDescriptionEnabled(true);
+    }
+  };
+
+  // Original individual AI recommendation handlers (kept for backwards compatibility)
   const handleAIRecommendMaterial = async (setId: string) => {
     if (!productName || !productPurpose || !productTarget) {
       alert('제품 정보를 모두 입력해주세요 (제품명, 용도, 타겟 사용자)');
@@ -236,12 +376,23 @@ export const BlueprintToCMF: React.FC<BlueprintToCMFProps> = ({ onNavigateHome }
       const materials = enabledSets.map(set => set.material);
       const colors = enabledSets.map(set => set.color);
       
-      // Enhanced prompt for blueprint to CMF conversion
-      const blueprintDescription = `Convert this blueprint/technical drawing into a realistic 3D rendered CMF design. Remove any pencil marks, sketch lines, or drawing artifacts. Create a clean, professional 3D product visualization with photorealistic materials and lighting. Apply the specified materials and colors to create a high-quality product rendering that looks like a finished consumer product. ${description}`;
+      // Enhanced prompt for blueprint to CMF conversion with AI recommendation
+      let fullDescription = `Convert this blueprint/technical drawing into a realistic 3D rendered CMF design. Remove any pencil marks, sketch lines, or drawing artifacts. Create a clean, professional 3D product visualization with photorealistic materials and lighting. Apply the specified materials and colors to create a high-quality product rendering that looks like a finished consumer product. ${description}`;
+      if (aiRecommendation?.reasoning) {
+        fullDescription = fullDescription + (description 
+          ? `\n\n[AI 추천 근거] ${aiRecommendation.reasoning}`
+          : `\n\n[AI 추천 근거] ${aiRecommendation.reasoning}`);
+      }
       
-      const result = await generateCmfDesign(uploadedFiles, materials, colors, blueprintDescription);
+      const result = await generateCmfDesign(uploadedFiles, materials, colors, fullDescription);
       setGeneratedImages(result.images);
-      setDesignExplanation(result.explanation);
+      
+      // AI 추천이 있다면 추천 설명을 디자인 분석에 포함
+      let enhancedExplanation = result.explanation;
+      if (aiRecommendation?.reasoning) {
+        enhancedExplanation = `🎨 AI 추천 분석\n${aiRecommendation.reasoning}\n\n📊 설계도 변환 결과\n${result.explanation}`;
+      }
+      setDesignExplanation(enhancedExplanation);
       
     } catch (err) {
       console.error(err);
@@ -279,6 +430,9 @@ export const BlueprintToCMF: React.FC<BlueprintToCMFProps> = ({ onNavigateHome }
     setProductTarget('');
     setFinishEnabled(false);
     setDescriptionEnabled(false);
+    setAiRecommendation(null);
+    setShowRecommendationBanner(false);
+    setIsRecommendationApplied(false);
   };
 
   const isReadyToGenerate = originalImages.some(img => img.file !== null);
@@ -325,6 +479,73 @@ export const BlueprintToCMF: React.FC<BlueprintToCMFProps> = ({ onNavigateHome }
         </div>
       </div>
 
+      {/* AI 추천 배너 */}
+      {showRecommendationBanner && aiRecommendation && (
+        <div className="space-y-6 bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 p-6 rounded-2xl shadow-lg">
+          {/* 제목과 닫기 버튼 */}
+          <div className="flex items-center justify-between">
+            <h3 className="text-xl font-bold text-purple-900">🎨 AI 디자인 추천</h3>
+            <button
+              onClick={dismissAIRecommendation}
+              className="text-purple-400 hover:text-purple-600 transition-colors"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          {/* 추천 정보 그리드 */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="bg-white/60 p-4 rounded-xl">
+              <div className="text-sm font-semibold text-purple-800 mb-2">추천 소재</div>
+              <div className="text-base font-medium text-purple-900">{aiRecommendation.material}</div>
+            </div>
+            <div className="bg-white/60 p-4 rounded-xl">
+              <div className="text-sm font-semibold text-purple-800 mb-2">추천 색상</div>
+              <div className="flex items-center gap-3">
+                <span className="w-6 h-6 rounded-full border-2 border-white shadow-sm" style={{backgroundColor: aiRecommendation.color}}></span>
+                <span className="text-base font-medium text-purple-900">{aiRecommendation.color}</span>
+              </div>
+            </div>
+            <div className="bg-white/60 p-4 rounded-xl">
+              <div className="text-sm font-semibold text-purple-800 mb-2">추천 마감</div>
+              <div className="text-base font-medium text-purple-900">{aiRecommendation.finish}</div>
+            </div>
+          </div>
+
+          {/* 상세 설명 */}
+          <div className="bg-white/70 p-5 rounded-xl">
+            <div className="text-sm font-semibold text-purple-800 mb-3">💡 추천 근거</div>
+            <div className="text-base text-purple-900 leading-relaxed whitespace-pre-line">
+              {aiRecommendation.reasoning}
+            </div>
+          </div>
+          <div className="flex gap-3">
+            <button
+              onClick={applyAIRecommendation}
+              disabled={isRecommendationApplied}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors text-sm font-medium ${
+                isRecommendationApplied
+                  ? 'bg-green-600 text-white cursor-default'
+                  : 'bg-purple-600 text-white hover:bg-purple-700'
+              }`}
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+              {isRecommendationApplied ? '적용됨' : '추천 적용하기'}
+            </button>
+            <button
+              onClick={dismissAIRecommendation}
+              className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium"
+            >
+              무시하기
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Controls Section */}
       {isReadyToGenerate && (
         <div className="space-y-6 bg-white/80 backdrop-blur-lg p-8 rounded-2xl shadow-2xl border border-pink-300/70">
@@ -349,6 +570,9 @@ export const BlueprintToCMF: React.FC<BlueprintToCMFProps> = ({ onNavigateHome }
             setFinishEnabled={setFinishEnabled}
             descriptionEnabled={descriptionEnabled}
             setDescriptionEnabled={setDescriptionEnabled}
+            recentColors={recentColors}
+            onAIRecommendation={handleAIRecommendation}
+            isAIRecommending={isAIRecommending}
             onAIRecommendMaterial={handleAIRecommendMaterial}
             onAIRecommendColor={handleAIRecommendColor}
             onAIRecommendFinish={handleAIRecommendFinish}
@@ -406,6 +630,13 @@ export const BlueprintToCMF: React.FC<BlueprintToCMFProps> = ({ onNavigateHome }
           )}
         </>
       )}
+
+      {/* AI 추천 모달 */}
+      <AIRecommendationModal
+        isOpen={isAIModalOpen}
+        onClose={() => setIsAIModalOpen(false)}
+        onRecommendation={handleAIRecommendationModal}
+      />
     </div>
   );
 };

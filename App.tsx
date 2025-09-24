@@ -26,7 +26,7 @@ const App: React.FC = () => {
   );
   // Material-Color sets (max 3)
   const [materialColorSets, setMaterialColorSets] = useState<MaterialColorSet[]>([
-    { id: '1', material: MATERIALS[0].name, color: '#007aff', enabled: true }
+    { id: '1', material: MATERIALS[0].name, color: '#007aff', enabled: false }
   ]);
   const [finish, setFinish] = useState<string>(FINISHES[0]);
   const [description, setDescription] = useState<string>('');
@@ -397,16 +397,25 @@ const App: React.FC = () => {
             {/* Hero Section */}
             <div className="space-y-6">
               <div className="flex justify-center">
-                <img src="/logos/logo2.png" alt="CMF Vision" className="h-12" />
+                <img src="/logos/logo2.png" alt="CMF Vision" className="h-20" />
               </div>
               <h2 className="text-3xl font-semibold text-indigo-900">
                 으로 스마트하고 빠르게<br />
                 아이디어를 완성하세요
               </h2>
-              <p className="text-xl text-indigo-800 max-w-2xl mx-auto">
-                AI 기술을 활용해 제품의 색상, 소재, 마감을 즉시 시각화하고<br />
-                완벽한 디자인 솔루션을 찾아보세요
-              </p>
+            </div>
+
+            {/* CTA Section */}
+            <div className="pt-4">
+              <button
+                onClick={() => handleNavigate('cmf-editor')}
+                className="inline-flex items-center justify-center gap-3 text-white text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 focus:ring-4 focus:ring-purple-200 rounded-2xl px-12 py-4 transition-all duration-200 shadow-2xl hover:shadow-3xl hover:scale-105 transform"
+              >
+                Start
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </button>
             </div>
 
             {/* Intro Video Section */}
@@ -446,19 +455,6 @@ const App: React.FC = () => {
                   브라우저가 비디오를 지원하지 않습니다.
                 </video>
               </div>
-            </div>
-
-            {/* CTA Section */}
-            <div className="pt-4">
-              <button
-                onClick={() => handleNavigate('cmf-editor')}
-                className="inline-flex items-center justify-center gap-3 text-white text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 focus:ring-4 focus:ring-purple-200 rounded-2xl px-12 py-4 transition-all duration-200 shadow-2xl hover:shadow-3xl hover:scale-105 transform"
-              >
-                Start
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
-              </button>
             </div>
             
           </div>
