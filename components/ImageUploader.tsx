@@ -4,6 +4,7 @@ import { UploadIcon } from './icons/UploadIcon';
 interface ImageUploaderProps {
   onImagesUpload: (files: File[]) => void;
   onImageRemove?: (index: number) => void;
+  onExampleImageSelect?: (imagePath: string) => void;
   previewUrls: (string | null)[];
   imageDescription: string;
   onImageDescriptionChange: (description: string) => void;
@@ -16,6 +17,7 @@ interface ImageUploaderProps {
 export const ImageUploader: React.FC<ImageUploaderProps> = ({ 
   onImagesUpload, 
   onImageRemove, 
+  onExampleImageSelect,
   previewUrls, 
   imageDescription, 
   onImageDescriptionChange,
@@ -108,6 +110,26 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
         )}
         <input id="dropzone-file" type="file" className="hidden" onChange={handleFileChange} accept="image/png, image/jpeg, image/webp" multiple />
       </label>
+      
+      {/* Example Images Section */}
+      {onExampleImageSelect && !hasImages && (
+        <div className="bg-blue-50 rounded-xl p-6">
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">예시 이미지</h3>
+          <p className="text-sm text-gray-600 mb-4">예시 이미지를 클릭하여 빠르게 시작해보세요</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            <div 
+              className="aspect-square bg-white rounded-lg overflow-hidden cursor-pointer hover:ring-2 hover:ring-blue-500 transition-all duration-200 shadow-sm hover:shadow-md"
+              onClick={() => onExampleImageSelect('/examples/iron-sketch.png')}
+            >
+              <img 
+                src="/examples/iron-sketch.png" 
+                alt="다리미 스케치 예시" 
+                className="w-full h-full object-cover"
+              />
+            </div>
+          </div>
+        </div>
+      )}
       
       {/* Product Information Section */}
       <div className="bg-gray-50 rounded-xl p-6 space-y-4">

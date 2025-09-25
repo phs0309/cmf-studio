@@ -76,6 +76,12 @@ export const BlueprintToCMF: React.FC<BlueprintToCMFProps> = ({ onNavigateHome }
       const fileName = imagePath.split('/').pop() || 'blueprint.jpg';
       const file = new File([blob], fileName, { type: blob.type });
       
+      // Pre-fill product information for iron example
+      if (imagePath.includes('iron-sketch')) {
+        setProductName('다리미');
+        setProductPurpose('20~30대 1인가구 젊은 여성, 가볍고 미니멀한 디자인 추구');
+      }
+      
       handleImagesUpload([file]);
     } catch (error) {
       console.error('Error loading example image:', error);

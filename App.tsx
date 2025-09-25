@@ -374,6 +374,49 @@ const App: React.FC = () => {
     setDesignerStep(2);
   };
 
+  // Handle importing generated image to CMF editor
+  const handleImportToCMFEdit = async (imageUrl: string, imageIndex: number) => {
+    try {
+      // Convert data URL to blob
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      const fileName = `generated-design-${imageIndex + 1}.png`;
+      const file = new File([blob], fileName, { type: 'image/png' });
+      
+      // Clear current images and set the selected generated image
+      setOriginalImages([
+        { file, previewUrl: imageUrl },
+        { file: null, previewUrl: null },
+        { file: null, previewUrl: null }
+      ]);
+      
+      // Clear previous generation results
+      setGeneratedImages([]);
+      setDesignExplanation('');
+      setError(null);
+      
+      // Reset CMF settings to default
+      setMaterialColorSets([{ id: '1', material: MATERIALS[0].name, color: '#007aff', enabled: true }]);
+      setFinish(FINISHES[0]);
+      setDescription('');
+      setFinishEnabled(false);
+      setDescriptionEnabled(false);
+      
+      // Clear AI recommendation state
+      setAiRecommendation(null);
+      setShowRecommendationBanner(false);
+      setIsRecommendationApplied(false);
+      
+      // Navigate to CMF editor
+      setCurrentPage('cmf-editor');
+      setDesignerStep(2);
+      
+    } catch (error) {
+      console.error('Error importing image to CMF editor:', error);
+      setError('이미지를 불러오는데 실패했습니다.');
+    }
+  };
+
   return (
     <div className="min-h-screen text-gray-800 font-sans relative overflow-hidden" style={{
       backgroundImage: `url('/logos/back.png')`,
@@ -608,7 +651,10 @@ const App: React.FC = () => {
                 
                 {showResults && (
                 <>
-                    <ResultDisplay generatedImageUrls={generatedImages} />
+                    <ResultDisplay 
+                      generatedImageUrls={generatedImages} 
+                      onImportToCMFEdit={handleImportToCMFEdit}
+                    />
                     
                     {/* Design Explanation */}
                     {designExplanation && generatedImages.length > 0 && (
