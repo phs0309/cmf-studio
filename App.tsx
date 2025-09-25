@@ -714,6 +714,16 @@ const App: React.FC = () => {
                                 >
                                     다시 하기
                                 </button>
+                                <button
+                                    onClick={() => handleImportToCMFEdit(generatedImages[0] ? `data:image/png;base64,${generatedImages[0]}` : '', 0)}
+                                    disabled={generatedImages.length === 0}
+                                    className="text-white bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 disabled:from-gray-400 disabled:to-gray-500 focus:ring-4 focus:ring-purple-200 font-bold rounded-xl text-base px-6 py-3 text-center transition-all duration-200 shadow-lg hover:shadow-xl flex items-center gap-2 disabled:cursor-not-allowed"
+                                >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                    </svg>
+                                    CMF 수정하기
+                                </button>
                             </div>
                         </>
                     )}
