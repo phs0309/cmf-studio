@@ -432,7 +432,10 @@ const App: React.FC = () => {
         
         {/* Render different pages based on currentPage */}
         {currentPage === 'blueprint-to-cmf' && (
-          <BlueprintToCMF onNavigateHome={handleNavigateHome} />
+          <BlueprintToCMF 
+            onNavigateHome={handleNavigateHome} 
+            onNavigateToCMFEdit={handleImportToCMFEdit}
+          />
         )}
         
         {currentPage === 'home' && designerStep === 1 && (
